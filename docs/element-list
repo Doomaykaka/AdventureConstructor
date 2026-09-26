@@ -1,2 +1,5 @@
-unnamed package
 adventureconstructor
+adventureconstructor.controllers
+adventureconstructor.gui
+adventureconstructor.models
+adventureconstructor.utils

@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"adventureconstructor"},{"l":"All Packages","u":"allpackages-index.html"}];updateSearchResults();
+packageSearchIndex = [{"l":"adventureconstructor"},{"l":"adventureconstructor.controllers"},{"l":"adventureconstructor.gui"},{"l":"adventureconstructor.models"},{"l":"adventureconstructor.utils"},{"l":"All Packages","u":"allpackages-index.html"}];updateSearchResults();

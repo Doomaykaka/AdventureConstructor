@@ -1,0 +1,266 @@
+{
+  "dialog_elder": {
+    "npc_name": "Старая Эльза",
+    "greeting": "А, путник... Далеко ли собрался?",
+    "nodes": [
+      {
+        "id": "start",
+        "text": "Чего тебе нужно? Я стара и не люблю гостей.",
+        "options": [
+          {
+            "text": "Поделись мудростью, бабушка.",
+            "type": "choice",
+            "next": "wisdom"
+          },
+          {
+            "text": "Дай мне еду и питьё.",
+            "type": "choice",
+            "next": "refuse"
+          },
+          {
+            "text": "[Убеждение] Тебе выгоднее помочь мне.",
+            "type": "dice",
+            "skill": "persuasion",
+            "dc": 12,
+            "success": "wisdom",
+            "fail": "refuse"
+          },
+          {
+            "text": "Уйду, не хочу мешать.",
+            "type": "choice",
+            "next": "leave"
+          }
+        ]
+      },
+      {
+        "id": "wisdom",
+        "text": "Хм... Ладно. Впереди будет развилка. Правая тропа безопаснее. Вот тебе травы.",
+        "reward": "exp+=15; hp+=heal10",
+        "success": true,
+        "end_dialog": true
+      },
+      {
+        "id": "refuse",
+        "text": "Нет у меня ничего для тебя. Уходи.",
+        "success": false,
+        "end_dialog": true
+      },
+      {
+        "id": "leave",
+        "text": "Мудрый выбор. Бери с миром.",
+        "reward": "exp+=5",
+        "success": true,
+        "end_dialog": true
+      }
+    ]
+  },
+  "dialog_trader": {
+    "npc_name": "Странствующий торговец",
+    "greeting": "О, покупатель! Заходи, заходи!",
+    "nodes": [
+      {
+        "id": "start",
+        "text": "У меня есть товар на любой кошелёк. Что интересует?",
+        "options": [
+          {
+            "text": "Покажи оружие.",
+            "type": "choice",
+            "next": "show_weapon"
+          },
+          {
+            "text": "Что слыхать на дорогах?",
+            "type": "choice",
+            "next": "rumors"
+          },
+          {
+            "text": "[Запугивание] Отдай товар бесплатно.",
+            "type": "dice",
+            "skill": "intimidation",
+            "dc": 15,
+            "success": "free_item",
+            "fail": "angry"
+          },
+          {
+            "text": "Ничего, спасибо.",
+            "type": "choice",
+            "next": "bye"
+          }
+        ]
+      },
+      {
+        "id": "show_weapon",
+        "text": "Вот отличный клинок! Всего 50 монет.",
+        "options": [
+          {
+            "text": "Беру! (50 золота)",
+            "type": "condition",
+            "check": "gold >= 50",
+            "success": "buy_weapon",
+            "fail": "no_gold"
+          },
+          {
+            "text": "Дорого. Может, уступишь?",
+            "type": "dice",
+            "skill": "persuasion",
+            "dc": 14,
+            "success": "discount",
+            "fail": "no_discount"
+          }
+        ]
+      },
+      {
+        "id": "buy_weapon",
+        "text": "Отличный выбор! Держи.",
+        "reward": "gold-=50; itemWeapon; exp+=10",
+        "success": true,
+        "end_dialog": true
+      },
+      {
+        "id": "discount",
+        "text": "Ладно, за 30 монет. Держи!",
+        "reward": "gold-=30; itemWeapon; exp+=15",
+        "success": true,
+        "end_dialog": true
+      },
+      {
+        "id": "no_gold",
+        "text": "Сначала монеты покажи, потом товар.",
+        "success": false,
+        "end_dialog": true
+      },
+      {
+        "id": "no_discount",
+        "text": "Цены фиксированные. Не нравится - не бери.",
+        "success": false,
+        "end_dialog": true
+      },
+      {
+        "id": "rumors",
+        "text": "Слыхал, на восточной тропе разбойники орудуют. А в руинах сундуки с золотом.",
+        "reward": "exp+=10",
+        "success": true,
+        "end_dialog": true
+      },
+      {
+        "id": "free_item",
+        "text": "Ладно, ладно! Бери, только не бей!",
+        "reward": "itemConsumable; gold+=20; exp+=5",
+        "success": true,
+        "end_dialog": true
+      },
+      {
+        "id": "angry",
+        "text": "Ты кому угрожаешь?! Уходи, пока я клич не поднял!",
+        "reward": "hp-=damage4",
+        "success": false,
+        "end_dialog": true
+      },
+      {
+        "id": "bye",
+        "text": "Заходи ещё!",
+        "reward": "exp+=3",
+        "success": true,
+        "end_dialog": true
+      }
+    ]
+  },
+  "dialog_priest": {
+    "npc_name": "Старый жрец",
+    "greeting": "Мир тебе, путник. Алтарь стар, но сила его жива.",
+    "nodes": [
+      {
+        "id": "start",
+        "text": "Ты выглядишь уставшим. Хочешь, я исцелю тебя? Но это потребует дара.",
+        "options": [
+          {
+            "text": "Да, исцели меня. Я готов отдать дар.",
+            "type": "choice",
+            "next": "heal"
+          },
+          {
+            "text": "[Убеждение] Ты и так должен помогать страждущим.",
+            "type": "dice",
+            "skill": "persuasion",
+            "dc": 18,
+            "success": "free_heal",
+            "fail": "scold"
+          },
+          {
+            "text": "Что за дар?",
+            "type": "choice",
+            "next": "explain"
+          },
+          {
+            "text": "Не нужно, спасибо.",
+            "type": "choice",
+            "next": "farewell"
+          }
+        ]
+      },
+      {
+        "id": "heal",
+        "text": "Тебе нужно 100 здоровья для полного ритуала. Иначе - лишь малое исцеление.",
+        "options": [
+          {
+            "text": "Проверь - я в полном порядке.",
+            "type": "condition",
+            "check": "hp >= 50",
+            "success": "full_heal",
+            "fail": "small_heal"
+          }
+        ]
+      },
+      {
+        "id": "full_heal",
+        "text": "Ты силён! Полный ритуал. Твои раны затягиваются.",
+        "reward": "hp+=heal50; exp+=25; sp+=1",
+        "success": true,
+        "end_dialog": true
+      },
+      {
+        "id": "small_heal",
+        "text": "Ты слаб... Лишь малое исцеление могу дать.",
+        "reward": "hp+=heal15; exp+=10",
+        "success": true,
+        "end_dialog": true
+      },
+      {
+        "id": "free_heal",
+        "text": "Хм... Ты прав. Истинная верь не требует платы.",
+        "reward": "hp+=heal30; exp+=30",
+        "success": true,
+        "end_dialog": true
+      },
+      {
+        "id": "scold",
+        "text": "Гордыня - путь к погибели. Уходи.",
+        "reward": "hp-=damage3",
+        "success": false,
+        "end_dialog": true
+      },
+      {
+        "id": "explain",
+        "text": "Дар - это опыт. Чем больше ты прожил, тем сильнее исцеление.",
+        "options": [
+          {
+            "text": "Хорошо, исцели меня.",
+            "type": "choice",
+            "next": "heal"
+          },
+          {
+            "text": "Передумал. Прощай.",
+            "type": "choice",
+            "next": "farewell"
+          }
+        ]
+      },
+      {
+        "id": "farewell",
+        "text": "Ступай с миром. Пусть дорога будет доброй.",
+        "reward": "exp+=5; hp+=heal5",
+        "success": true,
+        "end_dialog": true
+      }
+    ]
+  }
+}

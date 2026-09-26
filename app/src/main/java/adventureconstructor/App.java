@@ -1,7 +1,14 @@
 package adventureconstructor;
 
+import adventureconstructor.gui.GameUI;
+import javax.swing.SwingUtilities;
+
 public class App {
     public static void main(String[] args) {
-        System.out.println("Hello world");
+        SwingUtilities.invokeLater(() -> {
+            GameUI ui = new GameUI();
+            ui.setLocationRelativeTo(null);
+            ui.setVisible(true);
+        });
     }
 }
