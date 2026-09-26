@@ -1,0 +1,117 @@
+
+plugins {
+    // Apply the application plugin to add support for building a CLI application in Java.
+    id 'application'
+	id 'checkstyle'
+    id "com.diffplug.spotless" version "7.0.0"
+	id 'java'
+}
+
+repositories {
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+}
+
+var version = [0, 0, 1]
+
+dependencies {
+    // Use JUnit Jupiter for testing.
+    testImplementation libs.junit.jupiter
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'com.diffplug.spotless:spotless-plugin-gradle:7.0.0'
+
+    // This dependency is used by the application.
+    implementation libs.guava
+}
+
+// Apply a specific Java toolchain to ease working on different environments.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    
+    withJavadocJar()
+    withSourcesJar()
+}
+
+jar{
+  	manifest {
+        attributes(
+                'Main-Class': 'adventureconstructor.App'
+        )
+    }
+
+	// Include dependencies in jar
+	from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+    	exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+    }
+
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	archiveBaseName = 'Adventure Constructor(v' + version[0] + '_' + version[1] + '_' + version[2] + ')'
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'adventureconstructor.App'
+}
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
+}
+
+javadoc{
+	options.memberLevel = JavadocMemberLevel.PRIVATE
+	source = sourceSets.main.allJava
+	destinationDir = file("${project.rootDir}/docs")
+	title = "Adventure Constructor"
+}
+
+def taskX = tasks.register('javadocCopy') {
+	def directory = file(project.rootDir.getAbsolutePath() + "/javadoc/")
+
+    directory.mkdir()
+    copy {
+         from "${project.rootDir}/app/build/libs/app-javadoc.jar"
+         into directory.toPath()
+    }
+    copy {
+         from "${project.rootDir}/app/build/libs/app-sources.jar"
+         into directory.toPath()
+    }
+}
+
+tasks.named("build") { finalizedBy("javadocCopy") }
+
+spotless {
+  java {
+    removeUnusedImports()
+    importOrder()
+    palantirJavaFormat()
+    indentWithSpaces(4)
+    formatAnnotations()
+    trimTrailingWhitespace()
+    endWithNewline()
+  }
+}
+
+checkstyle {
+    toolVersion '10.3.3'
+    configFile file("${project.rootDir}/config/checkstyle/checkstyle.xml")
+    ignoreFailures = true
+    maxWarnings = 0
+    maxErrors = 0
+    showViolations = false
+}
+
+checkstyleMain{
+	ant.lifecycleLogLevel = "INFO"
+}
+
+checkstyleTest{
+	ant.lifecycleLogLevel = "INFO"
+}
