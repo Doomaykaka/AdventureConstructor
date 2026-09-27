@@ -9,6 +9,7 @@ public class LocTemp {
     private String name;
     private String desc;
     private String image = "";
+    private String ambient = "";
 
     private String npcName;
     private String dialogId;
@@ -150,5 +151,13 @@ public class LocTemp {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getAmbient() {
+        return ambient;
+    }
+
+    public void setAmbient(String ambient) {
+        this.ambient = ambient;
     }
 }

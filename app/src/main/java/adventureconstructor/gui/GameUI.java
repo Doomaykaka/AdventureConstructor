@@ -42,6 +42,13 @@ public class GameUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                eng.stopAmbient();
+            }
+        });
+
         // Scene panel (top center)
         scenePanel.setPreferredSize(new Dimension(900, 420));
         add(scenePanel, BorderLayout.NORTH);
@@ -87,6 +94,9 @@ public class GameUI extends JFrame {
         SwingUtilities.invokeLater(() -> {
             actionPanel.removeAll();
             textArea.setText("");
+
+            eng.playAmbientForMode();
+
             switch (eng.getMode()) {
                 case "START":
                     showStart();

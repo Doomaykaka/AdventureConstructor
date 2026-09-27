@@ -9,6 +9,7 @@ import adventureconstructor.models.LocAct;
 import adventureconstructor.models.LocTemp;
 import adventureconstructor.models.LocTempCloner;
 import adventureconstructor.models.Player;
+import adventureconstructor.utils.AmbientPlayer;
 import adventureconstructor.utils.SyntaxParser;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,6 +28,8 @@ public class GameEngine {
     private Map<String, DialogData> dialogs = new HashMap<>();
     private Map<String, List<String>> names = new HashMap<>();
     private Map<String, List<String>> imagePool = new HashMap<>();
+    private Map<String, List<String>> ambientPool = new HashMap<>();
+    private AmbientPlayer ambientPlayer = new AmbientPlayer();
     private SyntaxParser parser = new SyntaxParser();
     private Random rng = new Random();
 
@@ -62,6 +65,7 @@ public class GameEngine {
                     l.setName(jStr(lm, "name", ""));
                     l.setDesc(jStr(lm, "description", ""));
                     l.setImage(jStr(lm, "image", ""));
+                    l.setAmbient(jStr(lm, "ambient", ""));
                     if ("peaceful".equals(l.getType())) {
                         l.setNpcName(jStr(lm, "npc_name", ""));
                         l.setDialogId(jStr(lm, "dialog_id", ""));
@@ -187,6 +191,28 @@ public class GameEngine {
         } catch (Exception e) {
             System.err.println("Load images: " + e);
         }
+
+        try {
+            Path ambPath = Path.of(Path.of(System.getProperty(DATA_PARENT_FOLDER_NAME), "data/ambient.json")
+                    .toFile()
+                    .getAbsolutePath());
+            if (Files.exists(ambPath)) {
+                String ambText = new String(Files.readAllBytes(ambPath));
+                JSONObject root = (JSONObject) parser.parse(ambText);
+                for (Object eo : root.entrySet()) {
+                    Map.Entry<String, Object> en = (Map.Entry<String, Object>) eo;
+                    if (en.getValue() instanceof JSONArray) {
+                        List<String> sl = new ArrayList<>();
+                        for (Object o : (JSONArray) en.getValue()) {
+                            if (o != null) sl.add(o.toString());
+                        }
+                        ambientPool.put(en.getKey(), sl);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Load ambient: " + e);
+        }
     }
 
     // ---- Вспомогательные методы для json-simple ----
@@ -239,7 +265,75 @@ public class GameEngine {
                 cloned.setImage(imgs.get(rng.nextInt(imgs.size())));
             }
         }
+
+        if (cloned.getAmbient() == null || cloned.getAmbient().isEmpty()) {
+            List<String> ambs = ambientPool.get(cloned.getType());
+            if (ambs != null && !ambs.isEmpty()) {
+                cloned.setAmbient(ambs.get(rng.nextInt(ambs.size())));
+            }
+        }
+
         setCurLoc(cloned);
+    }
+
+    public void playAmbient(String type) {
+        String path = null;
+
+        // 1. Явный ambient из локации
+        if (getCurLoc() != null
+                && getCurLoc().getAmbient() != null
+                && !getCurLoc().getAmbient().isEmpty()) {
+            path = Path.of(
+                            System.getProperty(DATA_PARENT_FOLDER_NAME),
+                            "data",
+                            getCurLoc().getAmbient())
+                    .toFile()
+                    .getAbsolutePath();
+        }
+
+        // 2. Fallback на пул по типу
+        if (path == null) {
+            List<String> pool = ambientPool.get(type);
+            if (pool != null && !pool.isEmpty()) {
+                String rel = pool.get(rng.nextInt(pool.size()));
+                path = Path.of(System.getProperty(DATA_PARENT_FOLDER_NAME), "data", rel)
+                        .toFile()
+                        .getAbsolutePath();
+            }
+        }
+
+        ambientPlayer.play(path, true);
+    }
+
+    public void playAmbientForMode() {
+        switch (mode) {
+            case "COMBAT":
+                playAmbient("combat");
+                break;
+            case "GAMEOVER":
+                ambientPlayer.play(getAmbientPath("gameover"), false);
+                break;
+            case "START":
+            case "TRANSITION":
+                ambientPlayer.stop();
+                break;
+            default:
+                playAmbient(getCurLoc() != null ? getCurLoc().getType() : null);
+                break;
+        }
+    }
+
+    public void stopAmbient() {
+        ambientPlayer.stop();
+    }
+
+    private String getAmbientPath(String type) {
+        List<String> pool = ambientPool.get(type);
+        if (pool == null || pool.isEmpty()) return null;
+        String rel = pool.get(rng.nextInt(pool.size()));
+        return Path.of(System.getProperty(DATA_PARENT_FOLDER_NAME), "data", rel)
+                .toFile()
+                .getAbsolutePath();
     }
 
     public String getCurImagePath() {
