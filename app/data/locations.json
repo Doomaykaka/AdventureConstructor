@@ -1,7 +1,7 @@
 {
   "locations": [
-    {
-      "id": "village_01",
+	{
+      "id": "village",
       "type": "peaceful",
       "name": "Деревня у переправы",
       "description": "Небольшая деревня у реки. У костра сидит старуха и смотрит на огонь.",
@@ -10,64 +10,8 @@
       "on_success": "exp+=15; hp+=heal10",
       "on_fail": "hp-=damage3"
     },
-    {
-      "id": "camp_01",
-      "type": "peaceful",
-      "name": "Лагерь торговцев",
-      "description": "Торговец у повозки пересчитывает монеты. Он замечает вас.",
-      "npc_name": "Странствующий торговец",
-      "dialog_id": "dialog_trader",
-      "on_success": "exp+=20; gold+=random30",
-      "on_fail": "hp-=damage4"
-    },
-    {
-      "id": "shrine_01",
-      "type": "peaceful",
-      "name": "Заброшенный алтарь",
-      "description": "Старый жрец ухаживает за полуразрушенным алтарём. Он поднимает голову.",
-      "npc_name": "Старый жрец",
-      "dialog_id": "dialog_priest",
-      "on_success": "exp+=25; hp+=heal20; sp+=1",
-      "on_fail": "hp-=damage5"
-    },
-    {
-      "id": "camp_02",
-      "type": "hostile",
-      "name": "Лагерь разбойников",
-      "description": "Два разбойника у костра замечают вас и хватаются за оружие.",
-      "enemy_name": "Разбойник",
-      "enemy_hp": 30,
-      "enemy_damage": 6,
-      "enemy_defense": 2,
-      "on_victory": "exp+=scale20; gold+=random30; itemConsumable",
-      "on_defeat": "death"
-    },
-    {
-      "id": "cave_01",
-      "type": "hostile",
-      "name": "Тёмный провал",
-      "description": "Пещера с влажными стенами. Из тьмы на вас смотрят глаза.",
-      "enemy_name": "Пещерный гоблин",
-      "enemy_hp": 20,
-      "enemy_damage": 5,
-      "enemy_defense": 1,
-      "on_victory": "exp+=scale15; gold+=random20; itemWeapon",
-      "on_defeat": "death"
-    },
-    {
-      "id": "forest_01",
-      "type": "hostile",
-      "name": "Тёмный лес",
-      "description": "Между деревьев мелькает силуэт. Волк готовится к прыжку.",
-      "enemy_name": "Лесной волк",
-      "enemy_hp": 25,
-      "enemy_damage": 7,
-      "enemy_defense": 1,
-      "on_victory": "exp+=scale18; gold+=random15; itemArmor",
-      "on_defeat": "death"
-    },
-    {
-      "id": "ruins_01",
+	{
+      "id": "ruins",
       "type": "exploratory",
       "name": "Обваленные стены",
       "description": "Полузасыпанный коридор старых руин. В углу - камень, у стены - сундук.",
@@ -89,51 +33,31 @@
         }
       ]
     },
-    {
-      "id": "cross_01",
-      "type": "exploratory",
-      "name": "Развилка троп",
-      "description": "Тропа расходится на три направления. Куда пойти?",
-      "actions": [
-        {
-          "text": "Налево - к дымку костра",
-          "result": "exp+=5",
-          "next": "nextNPC"
-        },
-        {
-          "text": "Прямо - к тёмной пещере",
-          "result": "exp+=5",
-          "next": "nextFight"
-        },
-        {
-          "text": "Направо - к старым руинам",
-          "result": "exp+=5",
-          "next": "nextSearch"
-        }
-      ]
+	{
+      "id": "library",
+      "type": "hostile",
+      "name": "Библиотека",
+	  "image": "scimages/ork.jpg",
+      "description": "За рукописями присматривал зловонный страж.",
+      "enemy_name": "Орк",
+      "enemy_hp": 15,
+      "enemy_damage": 16,
+      "enemy_defense": 13,
+      "on_victory": "exp+=scale100; gold+=random15; random10>9 ? itemWeapon : itemConsumable; random10>9 ? itemArmor : itemConsumable",
+      "on_defeat": "death"
     },
-    {
-      "id": "chest_01",
-      "type": "exploratory",
-      "name": "Старый сундук",
-      "description": "Посреди тропы стоит старый сундук. В земле видны свежие следы.",
-      "actions": [
-        {
-          "text": "Открыть сундук",
-          "result": "hp>30 ? gold+=random40 : hp-=damage8; exp+=15",
-          "next": "nextFight"
-        },
-        {
-          "text": "Обойти стороной",
-          "result": "exp+=3",
-          "next": "nextSearch"
-        },
-        {
-          "text": "Осмотреть следы",
-          "result": "exp+=8; gold+=random10",
-          "next": "nextNPC"
-        }
-      ]
-    }
+	{
+      "id": "desert_charoms",
+      "type": "hostile",
+      "name": "Пустынные харомы",
+	  "image": "scimages/aarakokra.jpg",
+      "description": "Пустынный храм был недосягаем для путников из-за стража ветров.",
+      "enemy_name": "Ааракокра",
+      "enemy_hp": 13,
+      "enemy_damage": 10,
+      "enemy_defense": 12,
+      "on_victory": "exp+=scale100; gold+=random15; random10>9 ? itemWeapon : itemConsumable; random10>9 ? itemArmor : itemConsumable",
+      "on_defeat": "death"
+    },
   ]
 }

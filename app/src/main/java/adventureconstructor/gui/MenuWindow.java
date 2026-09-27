@@ -49,6 +49,7 @@ public class MenuWindow extends JFrame {
         JButton btnLoadGame = new JButton("Load game");
         JButton btnSaveGame = new JButton("Save game");
         JButton btnStatistic = new JButton("Statistic");
+        JButton btnSettings = new JButton("Settings");
         JButton btnExit = new JButton("Exit");
 
         int gap = 15;
@@ -56,12 +57,14 @@ public class MenuWindow extends JFrame {
         SupportFunctions.addButtonWithGap(panel, btnLoadGame, gap);
         SupportFunctions.addButtonWithGap(panel, btnSaveGame, gap);
         SupportFunctions.addButtonWithGap(panel, btnStatistic, gap);
+        SupportFunctions.addButtonWithGap(panel, btnSettings, gap);
         SupportFunctions.addButtonWithGap(panel, btnExit, gap);
 
         controls.add(btnNewGame);
         controls.add(btnLoadGame);
         controls.add(btnSaveGame);
         controls.add(btnStatistic);
+        controls.add(btnSettings);
         controls.add(btnExit);
 
         add(panel);
@@ -85,6 +88,12 @@ public class MenuWindow extends JFrame {
                     break;
                 case "Statistic":
                     AdditionalGameWindows.openStatsWindow();
+                    break;
+                case "Settings":
+                    SwingUtilities.invokeLater(() -> {
+                        OptionsWindow options = new OptionsWindow();
+                        options.showWindow();
+                    });
                     break;
                 case "Exit":
                     int confirm = JOptionPane.showConfirmDialog(

@@ -10,6 +10,7 @@ import adventureconstructor.models.LocTemp;
 import adventureconstructor.models.LocTempCloner;
 import adventureconstructor.models.Player;
 import adventureconstructor.utils.AmbientPlayer;
+import adventureconstructor.utils.SupportFunctions;
 import adventureconstructor.utils.SyntaxParser;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,6 +57,12 @@ public class GameEngine {
             gameOperationsController.updatePlayer(player.toDb());
         } catch (Exception e) {
             System.err.println("Sync player to DB: " + e);
+        }
+    }
+
+    private void incScore() {
+        if (player != null) {
+            player.setScore(player.getScore() + 1);
         }
     }
 
@@ -285,6 +292,12 @@ public class GameEngine {
         List<LocTemp> pool = new ArrayList<>();
         for (LocTemp l : locPool) if (forcedType == null || l.getType().equals(forcedType)) pool.add(l);
         if (pool.isEmpty()) pool = locPool;
+
+        if (locPool.isEmpty()) {
+            SupportFunctions.showMessage("For the game to run correctly, locations of all types are required");
+            return;
+        }
+
         LocTemp cloned = LocTempCloner.clone(pool.get(rng.nextInt(pool.size())));
 
         if (cloned.getImage() == null || cloned.getImage().isEmpty()) {
@@ -372,6 +385,10 @@ public class GameEngine {
     }
 
     public void enterLoc() {
+        if (getCurLoc() == null) {
+            return;
+        }
+
         if ("peaceful".equals(getCurLoc().getType())) {
             DialogData d = dialogs.get(getCurLoc().getDialogId());
             if (d != null) {
@@ -459,6 +476,7 @@ public class GameEngine {
         getPlayer().heal(getPlayer().getMaxHp() / 4);
         setTransitionMsg(success ? "Dialog succeeded." : "Dialog failed.");
         setMode("TRANSITION");
+        incScore();
         syncPlayerToDb();
     }
 
@@ -493,6 +511,7 @@ public class GameEngine {
             getPlayer().heal(getPlayer().getMaxHp() / 4);
             setTransitionMsg("Escaped successfully.");
             setMode("TRANSITION");
+            incScore();
             syncPlayerToDb();
         } else {
             getCombatLog().add("Failed to escape!");
@@ -524,6 +543,7 @@ public class GameEngine {
                 setTransitionMsg(
                         getCurEnemy().getName() + " fled! +" + (getCurEnemy().getMaxHp() / 2) + " exp.");
                 setMode("TRANSITION");
+                incScore();
                 syncPlayerToDb();
                 return;
             } else getCombatLog().add(getCurEnemy().getName() + " tries to flee but fails!");
@@ -547,6 +567,7 @@ public class GameEngine {
             getPlayer().heal(getPlayer().getMaxHp() / 4);
             setTransitionMsg("Victory! +" + exp + " exp.");
             setMode("TRANSITION");
+            incScore();
             syncPlayerToDb();
             return true;
         }
@@ -563,6 +584,7 @@ public class GameEngine {
         }
         if (nav == null) nav = a.getNext();
         getPlayer().heal(getPlayer().getMaxHp() / 4);
+        incScore();
         if ("nextFight".equals(nav)) genLocation("hostile");
         else if ("nextNPC".equals(nav)) genLocation("peaceful");
         else if ("nextSearch".equals(nav)) genLocation("exploratory");
