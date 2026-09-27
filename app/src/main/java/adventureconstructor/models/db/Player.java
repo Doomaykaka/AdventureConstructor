@@ -72,8 +72,6 @@ public class Player {
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Item> inventory = new ArrayList<>();
 
-    // --- Геттеры и сеттеры ---
-
     public Long getId() {
         return id;
     }

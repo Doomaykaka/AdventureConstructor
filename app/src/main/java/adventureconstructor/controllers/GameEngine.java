@@ -46,8 +46,6 @@ public class GameEngine {
 
     private static final String DATA_PARENT_FOLDER_NAME = "user.dir";
 
-    // ---- Контроллер БД ----
-
     public void setGameOperationsController(GameOperationsController controller) {
         this.gameOperationsController = controller;
     }
@@ -61,13 +59,22 @@ public class GameEngine {
         }
     }
 
-    // ---- Загрузка данных ----
-
     @SuppressWarnings("unchecked")
     public void loadData() {
         JSONParser parser = new JSONParser();
 
-        // ---- locations.json ----
+        loadLocations(parser);
+
+        loadDialogs(parser);
+
+        loadNames(parser);
+
+        loadImages(parser);
+
+        loadAmbient(parser);
+    }
+
+    private void loadLocations(JSONParser parser) {
         try {
             Path locPath = Path.of(Path.of(System.getProperty(DATA_PARENT_FOLDER_NAME), "data/locations.json")
                     .toFile()
@@ -116,8 +123,9 @@ public class GameEngine {
         } catch (Exception e) {
             System.err.println("Load locations: " + e);
         }
+    }
 
-        // ---- dialogs.json ----
+    private void loadDialogs(JSONParser parser) {
         try {
             Path dlgPath = Path.of(Path.of(System.getProperty(DATA_PARENT_FOLDER_NAME), "data/dialogs.json")
                     .toFile()
@@ -166,8 +174,9 @@ public class GameEngine {
         } catch (Exception e) {
             System.err.println("Load dialogs: " + e);
         }
+    }
 
-        // ---- names.json ----
+    private void loadNames(JSONParser parser) {
         try {
             Path nmPath = Path.of(Path.of(System.getProperty(DATA_PARENT_FOLDER_NAME), "data/names.json")
                     .toFile()
@@ -187,8 +196,9 @@ public class GameEngine {
         } catch (Exception e) {
             System.err.println("Load names: " + e);
         }
+    }
 
-        // ---- images.json ----
+    private void loadImages(JSONParser parser) {
         try {
             Path imgPath = Path.of(Path.of(System.getProperty(DATA_PARENT_FOLDER_NAME), "data/images.json")
                     .toFile()
@@ -210,8 +220,9 @@ public class GameEngine {
         } catch (Exception e) {
             System.err.println("Load images: " + e);
         }
+    }
 
-        // ---- ambient.json ----
+    private void loadAmbient(JSONParser parser) {
         try {
             Path ambPath = Path.of(Path.of(System.getProperty(DATA_PARENT_FOLDER_NAME), "data/ambient.json")
                     .toFile()
@@ -234,8 +245,6 @@ public class GameEngine {
             System.err.println("Load ambient: " + e);
         }
     }
-
-    // ---- Вспомогательные методы для json-simple ----
 
     private String jStr(JSONObject obj, String key, String def) {
         Object v = obj.get(key);
@@ -260,8 +269,6 @@ public class GameEngine {
         return "true".equalsIgnoreCase(v.toString());
     }
 
-    // ---- Игровой цикл ----
-
     public void newGame() {
         setPlayer(new Player());
         genLocation(null);
@@ -280,7 +287,6 @@ public class GameEngine {
         if (pool.isEmpty()) pool = locPool;
         LocTemp cloned = LocTempCloner.clone(pool.get(rng.nextInt(pool.size())));
 
-        // Если у локации нет явного image — берём случайный из пула по типу
         if (cloned.getImage() == null || cloned.getImage().isEmpty()) {
             List<String> imgs = imagePool.get(cloned.getType());
             if (imgs != null && !imgs.isEmpty()) {
@@ -288,7 +294,6 @@ public class GameEngine {
             }
         }
 
-        // Если у локации нет явного ambient — берём случайный из пула по типу
         if (cloned.getAmbient() == null || cloned.getAmbient().isEmpty()) {
             List<String> ambs = ambientPool.get(cloned.getType());
             if (ambs != null && !ambs.isEmpty()) {
@@ -308,12 +313,9 @@ public class GameEngine {
                 .getAbsolutePath();
     }
 
-    // ---- Ambient ----
-
     public void playAmbient(String type) {
         String path = null;
 
-        // 1. Явный ambient из локации
         if (getCurLoc() != null
                 && getCurLoc().getAmbient() != null
                 && !getCurLoc().getAmbient().isEmpty()) {
@@ -325,7 +327,6 @@ public class GameEngine {
                     .getAbsolutePath();
         }
 
-        // 2. Fallback на пул по типу
         if (path == null) {
             List<String> pool = ambientPool.get(type);
             if (pool != null && !pool.isEmpty()) {
@@ -370,8 +371,6 @@ public class GameEngine {
                 .getAbsolutePath();
     }
 
-    // ---- Смена локации ----
-
     public void enterLoc() {
         if ("peaceful".equals(getCurLoc().getType())) {
             DialogData d = dialogs.get(getCurLoc().getDialogId());
@@ -415,8 +414,6 @@ public class GameEngine {
         return r;
     }
 
-    // ---- Dialog ----
-
     public void chooseOption(DialogOption o) {
         if ("choice".equals(o.getType())) {
             setCurNode(getCurDialog().findNode(o.getNext()));
@@ -431,7 +428,7 @@ public class GameEngine {
         } else if ("condition".equals(o.getType())) {
             parser.setPlayer(getPlayer());
             parser.setEngine(this);
-            boolean ok = parser.evalCond(o.getCheck());
+            boolean ok = parser.evalCondition(o.getCheck());
             setCurNode(getCurDialog().findNode(ok ? o.getSuccess() : o.getFail()));
         }
         if (getCurNode() == null) {
@@ -464,8 +461,6 @@ public class GameEngine {
         setMode("TRANSITION");
         syncPlayerToDb();
     }
-
-    // ---- Combat ----
 
     public void pAttack() {
         int dmg = Math.max(1, getPlayer().atkDmg() - getCurEnemy().getDef());
@@ -558,8 +553,6 @@ public class GameEngine {
         return false;
     }
 
-    // ---- Exploration ----
-
     public void execAction(LocAct a) {
         String nav = parser.execute(a.getResult(), getPlayer(), this);
         if (getPlayer().getHp() <= 0) {
@@ -606,8 +599,6 @@ public class GameEngine {
         }
         getPlayer().getInv().add(it);
     }
-
-    // ---- Геттеры и сеттеры ----
 
     public String getMode() {
         return mode;

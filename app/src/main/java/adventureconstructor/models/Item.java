@@ -14,8 +14,6 @@ public class Item {
         this.value = value;
     }
 
-    // ---- Конверсия: бизнес → DB ----
-
     public adventureconstructor.models.db.Item toDb() {
         adventureconstructor.models.db.Item db = new adventureconstructor.models.db.Item();
         if (id != null) db.setId(id);
@@ -23,17 +21,6 @@ public class Item {
         db.setType(type);
         db.setValue(value);
         return db;
-    }
-
-    // ---- Конверсия: DB → бизнес ----
-
-    public static Item fromDb(adventureconstructor.models.db.Item db) {
-        Item biz = new Item();
-        biz.setId(db.getId());
-        biz.setName(db.getName());
-        biz.setType(db.getType());
-        biz.setValue(db.getValue());
-        return biz;
     }
 
     public Long getId() {
@@ -71,5 +58,14 @@ public class Item {
     @Override
     public String toString() {
         return name + " (" + type + ", +" + value + ")";
+    }
+
+    public static Item fromDb(adventureconstructor.models.db.Item db) {
+        Item biz = new Item();
+        biz.setId(db.getId());
+        biz.setName(db.getName());
+        biz.setType(db.getType());
+        biz.setValue(db.getValue());
+        return biz;
     }
 }

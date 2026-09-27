@@ -33,8 +33,6 @@ public class Item {
     @JoinColumn(name = "player_id", insertable = false, updatable = false)
     private Player player;
 
-    // --- Геттеры и сеттеры ---
-
     public Long getId() {
         return id;
     }

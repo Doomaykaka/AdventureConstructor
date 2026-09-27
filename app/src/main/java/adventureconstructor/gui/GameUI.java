@@ -57,18 +57,21 @@ public class GameUI extends JFrame {
             }
         });
 
-        // Scene panel (top center)
+        fillWindow();
+        loadData();
+        updateUI();
+    }
+
+    private void fillWindow() {
         scenePanel.setPreferredSize(new Dimension(900, 420));
         add(scenePanel, BorderLayout.NORTH);
 
-        // Text area (center)
         textArea.setEditable(false);
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
         textArea.setBackground(new Color(20, 20, 30));
         textArea.setForeground(Color.WHITE);
         add(new JScrollPane(textArea), BorderLayout.CENTER);
 
-        // Stats panel (right)
         statsPanel.setPreferredSize(new Dimension(200, 0));
         statsPanel.setBackground(new Color(25, 25, 35));
         statsPanel.setLayout(new BoxLayout(statsPanel, BoxLayout.Y_AXIS));
@@ -88,30 +91,26 @@ public class GameUI extends JFrame {
         lvlBtn.addActionListener(e -> showLevelUp());
         add(statsPanel, BorderLayout.EAST);
 
-        // Action panel (bottom)
         actionPanel.setPreferredSize(new Dimension(900, 60));
         actionPanel.setBackground(new Color(30, 30, 40));
         add(actionPanel, BorderLayout.SOUTH);
+    }
 
-        // Подключаем контроллер БД к движку
+    private void loadData() {
         PlayersDAO playersDAO = new PlayersDAO(HibernateConfiguration.getEntityManagerFactory());
         ItemsDAO itemsDAO = new ItemsDAO(HibernateConfiguration.getEntityManagerFactory());
         eng.setGameOperationsController(new GameOperationsController(playersDAO, itemsDAO));
 
         eng.loadData();
 
-        // Если игрок загружен из БД — сразу стартуем игру
         if (currentPlayer != null && currentPlayer.getId() != null) {
             eng.setPlayer(currentPlayer);
             eng.genLocation(null);
             eng.enterLoc();
         }
-
-        updateUI();
     }
 
     void updateUI() {
-        // Синхронизируем currentPlayer с движком
         if (eng.getPlayer() != null) {
             currentPlayer = eng.getPlayer();
             SaveLoadWindow.setCurrentPlayer(currentPlayer.toDb());
@@ -186,14 +185,9 @@ public class GameUI extends JFrame {
         scenePanel.setScene("Adventure Builder", "start");
         textArea.setText("Welcome to Adventure Builder!\n\n"
                 + "A procedurally generated RPG. Travel through endless locations,\n"
-                + "fight enemies, talk to NPCs, explore ruins.\n\n"
-                + "Death resets everything. Choose wisely.\n\n"
-                + "Stats:\n"
-                + "  STR - damage in combat\n"
-                + "  AGI - block & flee chance\n"
-                + "  INT - persuasion skill\n"
-                + "  END - max HP\n\n"
-                + "Click NEW GAME to begin.");
+                + "fight enemies, talk to NPCs, explore ruins.\n\n" + "Death resets everything. Choose wisely.\n\n"
+                + "Stats:\n" + "  STR - damage in combat\n" + "  AGI - block & flee chance\n"
+                + "  INT - persuasion skill\n" + "  END - max HP\n\n" + "Click NEW GAME to begin.");
         addButton("New Game", e -> {
             eng.newGame();
             updateUI();
@@ -278,9 +272,7 @@ public class GameUI extends JFrame {
     void showGameOver() {
         scenePanel.setScene("YOU DIED", "GAMEOVER");
         textArea.setText("Your journey ends here.\nLevel reached: "
-                + eng.getPlayer().getLevel()
-                + "\nGold: " + eng.getPlayer().getGold()
-                + "\n\nAll progress lost.");
+                + eng.getPlayer().getLevel() + "\nGold: " + eng.getPlayer().getGold() + "\n\nAll progress lost.");
         addButton("New Game", e -> {
             eng.newGame();
             updateUI();

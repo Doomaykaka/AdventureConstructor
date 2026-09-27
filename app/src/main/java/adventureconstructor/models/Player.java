@@ -27,8 +27,6 @@ public class Player {
     private Item weapon = null;
     private Item armor = null;
 
-    // ---- Бизнес-логика (без изменений) ----
-
     public int atkDmg() {
         return (weapon != null ? weapon.getValue() : 2) + str;
     }
@@ -94,8 +92,6 @@ public class Player {
         inv.remove(it);
     }
 
-    // ---- Конверсия: бизнес → DB ----
-
     public adventureconstructor.models.db.Player toDb() {
         adventureconstructor.models.db.Player db = new adventureconstructor.models.db.Player();
 
@@ -117,18 +113,23 @@ public class Player {
         db.setAlive(alive);
         db.setCurrentLocationId(currentLocationId);
 
+        linksToDBlinks(db);
+
+        return db;
+    }
+
+    private void linksToDBlinks(adventureconstructor.models.db.Player db) {
         List<adventureconstructor.models.db.Item> dbInv = new ArrayList<>();
         for (Item biz : inv) {
             adventureconstructor.models.db.Item dbItem = biz.toDb();
-            dbItem.setPlayerId(db.getId()); // ← КЛЮЧЕВАЯ СТРОКА
+            dbItem.setPlayerId(db.getId());
             dbItem.setPlayer(db);
             dbInv.add(dbItem);
         }
 
-        // weapon / armor тоже должны быть в инвентаре с playerId
         if (weapon != null) {
             adventureconstructor.models.db.Item dbW = weapon.toDb();
-            dbW.setPlayerId(db.getId()); // ←
+            dbW.setPlayerId(db.getId());
             dbW.setPlayer(db);
             dbW.setEquipped(true);
             dbW.setSlot("weapon");
@@ -137,7 +138,7 @@ public class Player {
         }
         if (armor != null) {
             adventureconstructor.models.db.Item dbA = armor.toDb();
-            dbA.setPlayerId(db.getId()); // ←
+            dbA.setPlayerId(db.getId());
             dbA.setPlayer(db);
             dbA.setEquipped(true);
             dbA.setSlot("armor");
@@ -146,49 +147,7 @@ public class Player {
         }
 
         db.setInventory(dbInv);
-        return db;
     }
-
-    // ---- Конверсия: DB → бизнес ----
-
-    public static Player fromDb(adventureconstructor.models.db.Player db) {
-        Player biz = new Player();
-
-        biz.setId(db.getId());
-        biz.setName(db.getName());
-        biz.setCreationDate(db.getCreationDate());
-        biz.setHp(db.getHp());
-        biz.setMaxHp(db.getMaxHp());
-        biz.setGold(db.getGold());
-        biz.setLevel(db.getLevel());
-        biz.setExp(db.getExp());
-        biz.setExpNext(db.getExpNext());
-        biz.setSp(db.getSp());
-        biz.setStr(db.getStr());
-        biz.setAgi(db.getAgi());
-        biz.setIntl(db.getIntl());
-        biz.setEnd(db.getEnd());
-        biz.setScore(db.getScore());
-        biz.setAlive(db.isAlive());
-        biz.setCurrentLocationId(db.getCurrentLocationId());
-
-        List<Item> bizInv = new ArrayList<>();
-        for (adventureconstructor.models.db.Item di : db.getInventory()) {
-            Item bizItem = Item.fromDb(di);
-            if (di.isEquipped() && "weapon".equals(di.getSlot())) {
-                biz.setWeapon(bizItem);
-            } else if (di.isEquipped() && "armor".equals(di.getSlot())) {
-                biz.setArmor(bizItem);
-            } else {
-                bizInv.add(bizItem);
-            }
-        }
-        biz.setInv(bizInv);
-
-        return biz;
-    }
-
-    // ---- Геттеры и сеттеры (расширенные) ----
 
     public Long getId() {
         return id;
@@ -348,5 +307,46 @@ public class Player {
 
     public void setArmor(Item armor) {
         this.armor = armor;
+    }
+
+    public static Player fromDb(adventureconstructor.models.db.Player db) {
+        Player biz = new Player();
+
+        biz.setId(db.getId());
+        biz.setName(db.getName());
+        biz.setCreationDate(db.getCreationDate());
+        biz.setHp(db.getHp());
+        biz.setMaxHp(db.getMaxHp());
+        biz.setGold(db.getGold());
+        biz.setLevel(db.getLevel());
+        biz.setExp(db.getExp());
+        biz.setExpNext(db.getExpNext());
+        biz.setSp(db.getSp());
+        biz.setStr(db.getStr());
+        biz.setAgi(db.getAgi());
+        biz.setIntl(db.getIntl());
+        biz.setEnd(db.getEnd());
+        biz.setScore(db.getScore());
+        biz.setAlive(db.isAlive());
+        biz.setCurrentLocationId(db.getCurrentLocationId());
+
+        linksFromDBlinks(biz, db);
+
+        return biz;
+    }
+
+    private static void linksFromDBlinks(Player biz, adventureconstructor.models.db.Player db) {
+        List<Item> bizInv = new ArrayList<>();
+        for (adventureconstructor.models.db.Item di : db.getInventory()) {
+            Item bizItem = Item.fromDb(di);
+            if (di.isEquipped() && "weapon".equals(di.getSlot())) {
+                biz.setWeapon(bizItem);
+            } else if (di.isEquipped() && "armor".equals(di.getSlot())) {
+                biz.setArmor(bizItem);
+            } else {
+                bizInv.add(bizItem);
+            }
+        }
+        biz.setInv(bizInv);
     }
 }
