@@ -262,5 +262,104 @@
         "end_dialog": true
       }
     ]
+  },
+  "test_dialog": {
+    "npc_name": "Тестовый персонаж",
+    "greeting": "Стартовый текст персонажа.",
+    "nodes": [
+      {
+        "id": "start",
+        "text": "Начало.",
+        "options": [
+          {
+            "text": "Лечи.",
+            "type": "choice",
+            "next": "heal"
+          },
+          {
+            "text": "[Убеждение] Ты и так должен помогать страждущим.",
+            "type": "dice",
+            "skill": "persuasion",
+            "dc": 18,
+            "success": "free_heal",
+            "fail": "scold"
+          },
+          {
+            "text": "Что за дар?",
+            "type": "choice",
+            "next": "explain"
+          },
+          {
+            "text": "Не нужно, спасибо.",
+            "type": "choice",
+            "next": "farewell"
+          }
+        ]
+      },
+      {
+        "id": "heal",
+        "text": "Тебе нужно 100 здоровья для полного ритуала. Иначе - лишь малое исцеление.",
+        "options": [
+          {
+            "text": "Проверь - я в полном порядке.",
+            "type": "condition",
+            "check": "hp >= 50",
+            "success": "full_heal",
+            "fail": "small_heal"
+          }
+        ]
+      },
+      {
+        "id": "full_heal",
+        "text": "Ты силён! Полный ритуал. Твои раны затягиваются.",
+        "reward": "hp+=heal50; exp+=25; sp+=1",
+        "success": true,
+        "end_dialog": true
+      },
+      {
+        "id": "small_heal",
+        "text": "Ты слаб... Лишь малое исцеление могу дать.",
+        "reward": "hp+=heal15; exp+=10",
+        "success": true,
+        "end_dialog": true
+      },
+      {
+        "id": "free_heal",
+        "text": "Хм... Ты прав. Истинная верь не требует платы.",
+        "reward": "hp+=heal30; exp+=30",
+        "success": true,
+        "end_dialog": true
+      },
+      {
+        "id": "scold",
+        "text": "Гордыня - путь к погибели. Уходи.",
+        "reward": "hp-=damage3",
+        "success": false,
+        "end_dialog": true
+      },
+      {
+        "id": "explain",
+        "text": "Дар - это опыт. Чем больше ты прожил, тем сильнее исцеление.",
+        "options": [
+          {
+            "text": "Хорошо, исцели меня.",
+            "type": "choice",
+            "next": "heal"
+          },
+          {
+            "text": "Передумал. Прощай.",
+            "type": "choice",
+            "next": "farewell"
+          }
+        ]
+      },
+      {
+        "id": "farewell",
+        "text": "Ступай с миром. Пусть дорога будет доброй.",
+        "reward": "exp+=5; hp+=heal5",
+        "success": true,
+        "end_dialog": true
+      }
+    ]
   }
 }
