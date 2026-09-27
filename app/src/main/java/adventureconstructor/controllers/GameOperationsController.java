@@ -49,23 +49,22 @@ public class GameOperationsController {
 
     public void savePlayer(Player player) {
         Logger.getInstance().info("Save player: " + player.getName());
+
+        // Сначала сохраняем игрока ( cascade создаёт предметы с player_id = null )
         this.playersDAO.create(player);
+
+        // Затем обновляем предметы с правильным player_id
         for (Item item : player.getInventory()) {
             item.setPlayerId(player.getId());
-            this.itemsDAO.create(item);
+            this.itemsDAO.update(item);
         }
     }
 
     public void updatePlayer(Player player) {
         Logger.getInstance().info("Update player: " + player.getName());
-        for (Item item : player.getInventory()) {
-            if (item.getId() == null) {
-                item.setPlayerId(player.getId());
-                this.itemsDAO.create(item);
-            } else {
-                this.itemsDAO.update(item);
-            }
-        }
+
+        // toDb() уже выставил playerId на всех предметах —
+        // cascade + orphanRemoval сделают всё остальное
         this.playersDAO.update(player);
     }
 

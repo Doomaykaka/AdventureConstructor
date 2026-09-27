@@ -117,37 +117,35 @@ public class Player {
         db.setAlive(alive);
         db.setCurrentLocationId(currentLocationId);
 
-        // Инвентарь
         List<adventureconstructor.models.db.Item> dbInv = new ArrayList<>();
         for (Item biz : inv) {
             adventureconstructor.models.db.Item dbItem = biz.toDb();
+            dbItem.setPlayerId(db.getId()); // ← КЛЮЧЕВАЯ СТРОКА
             dbItem.setPlayer(db);
             dbInv.add(dbItem);
         }
-        db.setInventory(dbInv);
 
-        // weaponId / armorId — по имени предмета в инвентаре
+        // weapon / armor тоже должны быть в инвентаре с playerId
         if (weapon != null) {
-            for (adventureconstructor.models.db.Item di : dbInv) {
-                if (di.getName().equals(weapon.getName()) && "weapon".equals(di.getType())) {
-                    di.setEquipped(true);
-                    di.setSlot("weapon");
-                    db.setWeaponId(di.getId());
-                    break;
-                }
-            }
+            adventureconstructor.models.db.Item dbW = weapon.toDb();
+            dbW.setPlayerId(db.getId()); // ←
+            dbW.setPlayer(db);
+            dbW.setEquipped(true);
+            dbW.setSlot("weapon");
+            dbInv.add(dbW);
+            db.setWeaponId(dbW.getId());
         }
         if (armor != null) {
-            for (adventureconstructor.models.db.Item di : dbInv) {
-                if (di.getName().equals(armor.getName()) && "armor".equals(di.getType())) {
-                    di.setEquipped(true);
-                    di.setSlot("armor");
-                    db.setArmorId(di.getId());
-                    break;
-                }
-            }
+            adventureconstructor.models.db.Item dbA = armor.toDb();
+            dbA.setPlayerId(db.getId()); // ←
+            dbA.setPlayer(db);
+            dbA.setEquipped(true);
+            dbA.setSlot("armor");
+            dbInv.add(dbA);
+            db.setArmorId(dbA.getId());
         }
 
+        db.setInventory(dbInv);
         return db;
     }
 
@@ -176,23 +174,16 @@ public class Player {
 
         List<Item> bizInv = new ArrayList<>();
         for (adventureconstructor.models.db.Item di : db.getInventory()) {
-            bizInv.add(Item.fromDb(di));
-        }
-        biz.setInv(bizInv);
-
-        // Восстановление weapon/armor по equipped + slot
-        for (int i = 0; i < bizInv.size(); i++) {
-            adventureconstructor.models.db.Item di = db.getInventory().get(i);
+            Item bizItem = Item.fromDb(di);
             if (di.isEquipped() && "weapon".equals(di.getSlot())) {
-                biz.setWeapon(bizInv.get(i));
+                biz.setWeapon(bizItem);
             } else if (di.isEquipped() && "armor".equals(di.getSlot())) {
-                biz.setArmor(bizInv.get(i));
+                biz.setArmor(bizItem);
+            } else {
+                bizInv.add(bizItem);
             }
         }
-
-        // Оружие/броня не дублируются в inv
-        if (biz.getWeapon() != null) bizInv.remove(biz.getWeapon());
-        if (biz.getArmor() != null) bizInv.remove(biz.getArmor());
+        biz.setInv(bizInv);
 
         return biz;
     }
