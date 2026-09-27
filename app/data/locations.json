@@ -43,7 +43,8 @@
       "enemy_hp": 15,
       "enemy_damage": 16,
       "enemy_defense": 13,
-      "on_victory": "exp+=scale100; gold+=random15; random10>9 ? itemWeapon : itemConsumable; random10>9 ? itemArmor : itemConsumable",
+	  "scale_enemy": false,
+      "on_victory": "exp+=scale100; gold+=random15; random10>6 ? itemWeapon : itemConsumable; random10>6 ? itemArmor : itemConsumable",
       "on_defeat": "death"
     },
 	{
@@ -56,7 +57,22 @@
       "enemy_hp": 13,
       "enemy_damage": 10,
       "enemy_defense": 12,
-      "on_victory": "exp+=scale100; gold+=random15; random10>9 ? itemWeapon : itemConsumable; random10>9 ? itemArmor : itemConsumable",
+	  "scale_enemy": false,
+      "on_victory": "exp+=scale100; gold+=random15; random10>6 ? itemWeapon : itemConsumable; random10>6 ? itemArmor : itemConsumable",
+      "on_defeat": "death"
+    },
+	{
+      "id": "underground_lake",
+      "type": "hostile",
+      "name": "Подземно озеро",
+	  "image": "scimages/abolet.jpg",
+      "description": "На поверхности чистого подземного озера появилась рябь.",
+      "enemy_name": "Аболет",
+      "enemy_hp": 135,
+      "enemy_damage": 21,
+      "enemy_defense": 17,
+	  "scale_enemy": false,
+      "on_victory": "exp+=scale100; gold+=random15; random10>6 ? itemWeapon : itemConsumable; random10>6 ? itemArmor : itemConsumable",
       "on_defeat": "death"
     },
   ]

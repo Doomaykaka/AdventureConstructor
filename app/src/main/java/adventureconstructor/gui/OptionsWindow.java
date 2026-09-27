@@ -51,15 +51,18 @@ public class OptionsWindow extends JFrame {
         JPanel chkLogApp = SupportFunctions.getEntityWindowCheckbox("Log app");
         JPanel chkUseLaf = SupportFunctions.getEntityWindowCheckbox("Use Laf");
         JPanel chkUseDark = SupportFunctions.getEntityWindowCheckbox("Use Dark theme");
+        JPanel chkUseSound = SupportFunctions.getEntityWindowCheckbox("Use sound");
 
         int gap = 15;
         SupportFunctions.addChildPanelWithGap(panel, chkLogApp, gap);
         SupportFunctions.addChildPanelWithGap(panel, chkUseLaf, gap);
         SupportFunctions.addChildPanelWithGap(panel, chkUseDark, gap);
+        SupportFunctions.addChildPanelWithGap(panel, chkUseSound, gap);
 
         options.add(chkLogApp);
         options.add(chkUseLaf);
         options.add(chkUseDark);
+        options.add(chkUseSound);
 
         windowLayer.add(panel);
 
@@ -94,10 +97,12 @@ public class OptionsWindow extends JFrame {
         JPanel logAppPanel = options.get(0);
         JPanel useLafPanel = options.get(1);
         JPanel useDarkPanel = options.get(2);
+        JPanel useSoundPanel = options.get(3);
 
         SupportFunctions.setEntityWindowCheckboxValue(logAppPanel, configReader.getLogApp());
         SupportFunctions.setEntityWindowCheckboxValue(useLafPanel, configReader.getUseLAF());
         SupportFunctions.setEntityWindowCheckboxValue(useDarkPanel, configReader.getUseDark());
+        SupportFunctions.setEntityWindowCheckboxValue(useSoundPanel, configReader.getUseSound());
     }
 
     private void addButtonsActionListeners(List<JButton> buttons, List<JPanel> options) {
@@ -129,14 +134,17 @@ public class OptionsWindow extends JFrame {
         JPanel logAppPanel = options.get(0);
         JPanel useLafPanel = options.get(1);
         JPanel useDarkPanel = options.get(2);
+        JPanel useSoundPanel = options.get(3);
 
         boolean logApp = SupportFunctions.getEntityWindowCheckboxValue(logAppPanel);
         boolean useLaf = SupportFunctions.getEntityWindowCheckboxValue(useLafPanel);
         boolean useDark = SupportFunctions.getEntityWindowCheckboxValue(useDarkPanel);
+        boolean useSound = SupportFunctions.getEntityWindowCheckboxValue(useSoundPanel);
 
         configReader.setLogApp(logApp);
         configReader.setUseLAF(useLaf);
         configReader.setUseDark(useDark);
+        configReader.setUseSound(useSound);
 
         try {
             configReader.saveConfig();

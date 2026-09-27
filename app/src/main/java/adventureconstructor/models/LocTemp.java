@@ -22,6 +22,7 @@ public class LocTemp {
     private int enemyDef;
     private String onVictory;
     private String onDefeat;
+    private boolean scaleEnemy = true;
 
     private List<LocAct> actions = new ArrayList<>();
 
@@ -159,5 +160,13 @@ public class LocTemp {
 
     public void setAmbient(String ambient) {
         this.ambient = ambient;
+    }
+
+    public boolean isScaleEnemy() {
+        return scaleEnemy;
+    }
+
+    public void setScaleEnemy(boolean scaleEnemy) {
+        this.scaleEnemy = scaleEnemy;
     }
 }

@@ -43,6 +43,8 @@ public class GameEngine {
     private List<String> combatLog = new ArrayList<>();
     private String transitionMsg = "";
 
+    private String lastAmbientKey = null;
+
     private GameOperationsController gameOperationsController;
 
     private static final String DATA_PARENT_FOLDER_NAME = "user.dir";
@@ -71,13 +73,9 @@ public class GameEngine {
         JSONParser parser = new JSONParser();
 
         loadLocations(parser);
-
         loadDialogs(parser);
-
         loadNames(parser);
-
         loadImages(parser);
-
         loadAmbient(parser);
     }
 
@@ -111,6 +109,7 @@ public class GameEngine {
                         l.setEnemyDef(jInt(lm, "enemy_defense", 2));
                         l.setOnVictory(jStr(lm, "on_victory", ""));
                         l.setOnDefeat(jStr(lm, "on_defeat", ""));
+                        l.setScaleEnemy(jBool(lm, "scale_enemy", true));
                     } else if ("exploratory".equals(l.getType())) {
                         JSONArray acts = (JSONArray) lm.get("actions");
                         if (acts != null) {
@@ -354,6 +353,11 @@ public class GameEngine {
     }
 
     public void playAmbientForMode() {
+        String key = mode + "_" + (curLoc != null ? System.identityHashCode(curLoc) : "null");
+
+        if (key.equals(lastAmbientKey)) return;
+        lastAmbientKey = key;
+
         switch (mode) {
             case "COMBAT":
                 playAmbient("combat");
@@ -402,7 +406,13 @@ public class GameEngine {
         if ("hostile".equals(getCurLoc().getType())) {
             setCurEnemy(new Enemy());
             getCurEnemy().setName(getCurLoc().getEnemyName());
-            getCurEnemy().scale(getPlayer().getLevel());
+            getCurEnemy().setHp(getCurLoc().getEnemyHp());
+            getCurEnemy().setMaxHp(getCurLoc().getEnemyHp());
+            getCurEnemy().setDmg(getCurLoc().getEnemyDmg());
+            getCurEnemy().setDef(getCurLoc().getEnemyDef());
+            if (getCurLoc().isScaleEnemy()) {
+                getCurEnemy().scale(getPlayer().getLevel());
+            }
             playerGuarding = false;
             getCombatLog().clear();
             getCombatLog()
@@ -459,7 +469,13 @@ public class GameEngine {
         if (getCurNode().isTriggerCombat()) {
             setCurEnemy(new Enemy());
             getCurEnemy().setName(getCurLoc().getNpcName());
-            getCurEnemy().scale(getPlayer().getLevel());
+            getCurEnemy().setHp(getCurLoc().getEnemyHp());
+            getCurEnemy().setMaxHp(getCurLoc().getEnemyHp());
+            getCurEnemy().setDmg(getCurLoc().getEnemyDmg());
+            getCurEnemy().setDef(getCurLoc().getEnemyDef());
+            if (getCurLoc().isScaleEnemy()) {
+                getCurEnemy().scale(getPlayer().getLevel());
+            }
             playerGuarding = false;
             getCombatLog().clear();
             setMode("COMBAT");

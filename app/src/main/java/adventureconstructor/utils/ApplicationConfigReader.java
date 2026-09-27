@@ -20,6 +20,7 @@ public class ApplicationConfigReader {
     private static final String PROPERTY_NAME_LOG_APP = "log-app";
     private static final String PROPERTY_NAME_USE_LAF = "use-laf";
     private static final String PROPERTY_NAME_USE_DARK = "use-dark";
+    private static final String PROPERTY_NAME_USE_SOUND = "use-sound";
 
     private static final String CONFIG_FILENAME = "settings.conf";
 
@@ -40,6 +41,7 @@ public class ApplicationConfigReader {
     private Boolean logApp = false;
     private Boolean useLAF = true;
     private Boolean useDark = true;
+    private Boolean useSound = true;
 
     private Path pathToConfig;
 
@@ -76,6 +78,7 @@ public class ApplicationConfigReader {
         logApp = Boolean.parseBoolean(getProperty(prop, PROPERTY_NAME_LOG_APP));
         useLAF = Boolean.parseBoolean(getProperty(prop, PROPERTY_NAME_USE_LAF));
         useDark = Boolean.parseBoolean(getProperty(prop, PROPERTY_NAME_USE_DARK));
+        useSound = Boolean.parseBoolean(getProperty(prop, PROPERTY_NAME_USE_SOUND));
 
         lastConfig = this;
     }
@@ -104,6 +107,7 @@ public class ApplicationConfigReader {
         setProperty(properties, PROPERTY_NAME_LOG_APP, logApp.toString());
         setProperty(properties, PROPERTY_NAME_USE_LAF, useLAF.toString());
         setProperty(properties, PROPERTY_NAME_USE_DARK, useDark.toString());
+        setProperty(properties, PROPERTY_NAME_USE_SOUND, useSound.toString());
 
         properties.store(configFOS, Constants.DEFAULT_TEXT);
         configFOS.flush();
@@ -164,6 +168,14 @@ public class ApplicationConfigReader {
 
     public Boolean getUseDark() {
         return useDark;
+    }
+
+    public Boolean getUseSound() {
+        return useSound;
+    }
+
+    public void setUseSound(Boolean useSound) {
+        this.useSound = useSound;
     }
 
     public void setLogApp(Boolean logApp) {

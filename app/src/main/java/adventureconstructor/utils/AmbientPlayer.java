@@ -11,6 +11,10 @@ public class AmbientPlayer {
     public void play(String path, boolean loop) {
         stop();
 
+        if (!ApplicationConfigReader.getLastConfig().getUseSound()) {
+            return;
+        }
+
         if (path == null || path.isEmpty()) return;
 
         File f = new File(path);
