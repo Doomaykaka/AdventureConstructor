@@ -8,6 +8,7 @@ public class LocTemp {
     private String type;
     private String name;
     private String desc;
+    private String image = "";
 
     private String npcName;
     private String dialogId;
@@ -141,5 +142,13 @@ public class LocTemp {
 
     public void setActions(List<LocAct> actions) {
         this.actions = actions;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

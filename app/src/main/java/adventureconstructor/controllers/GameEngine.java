@@ -26,6 +26,7 @@ public class GameEngine {
     private List<LocTemp> locPool = new ArrayList<>();
     private Map<String, DialogData> dialogs = new HashMap<>();
     private Map<String, List<String>> names = new HashMap<>();
+    private Map<String, List<String>> imagePool = new HashMap<>();
     private SyntaxParser parser = new SyntaxParser();
     private Random rng = new Random();
 
@@ -60,6 +61,7 @@ public class GameEngine {
                     l.setType(jStr(lm, "type", ""));
                     l.setName(jStr(lm, "name", ""));
                     l.setDesc(jStr(lm, "description", ""));
+                    l.setImage(jStr(lm, "image", ""));
                     if ("peaceful".equals(l.getType())) {
                         l.setNpcName(jStr(lm, "npc_name", ""));
                         l.setDialogId(jStr(lm, "dialog_id", ""));
@@ -162,6 +164,29 @@ public class GameEngine {
         } catch (Exception e) {
             System.err.println("Load names: " + e);
         }
+
+        // ---- images.json ----
+        try {
+            Path imgPath = Path.of(Path.of(System.getProperty(DATA_PARENT_FOLDER_NAME), "data/images.json")
+                    .toFile()
+                    .getAbsolutePath());
+            if (Files.exists(imgPath)) {
+                String imgText = new String(Files.readAllBytes(imgPath));
+                JSONObject root = (JSONObject) parser.parse(imgText);
+                for (Object eo : root.entrySet()) {
+                    Map.Entry<String, Object> en = (Map.Entry<String, Object>) eo;
+                    if (en.getValue() instanceof JSONArray) {
+                        List<String> sl = new ArrayList<>();
+                        for (Object o : (JSONArray) en.getValue()) {
+                            if (o != null) sl.add(o.toString());
+                        }
+                        imagePool.put(en.getKey(), sl);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Load images: " + e);
+        }
     }
 
     // ---- Вспомогательные методы для json-simple ----
@@ -205,7 +230,25 @@ public class GameEngine {
         List<LocTemp> pool = new ArrayList<>();
         for (LocTemp l : locPool) if (forcedType == null || l.getType().equals(forcedType)) pool.add(l);
         if (pool.isEmpty()) pool = locPool;
-        setCurLoc(LocTempCloner.clone(pool.get(rng.nextInt(pool.size()))));
+        LocTemp cloned = LocTempCloner.clone(pool.get(rng.nextInt(pool.size())));
+
+        // Если у локации нет явного image — берём случайный из пула по типу
+        if (cloned.getImage() == null || cloned.getImage().isEmpty()) {
+            List<String> imgs = imagePool.get(cloned.getType());
+            if (imgs != null && !imgs.isEmpty()) {
+                cloned.setImage(imgs.get(rng.nextInt(imgs.size())));
+            }
+        }
+        setCurLoc(cloned);
+    }
+
+    public String getCurImagePath() {
+        if (getCurLoc() == null) return null;
+        String img = getCurLoc().getImage();
+        if (img == null || img.isEmpty()) return null;
+        return Path.of(System.getProperty(DATA_PARENT_FOLDER_NAME), "data", img)
+                .toFile()
+                .getAbsolutePath();
     }
 
     void enterLoc() {

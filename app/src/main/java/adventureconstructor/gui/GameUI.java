@@ -37,13 +37,13 @@ public class GameUI extends JFrame {
     private JButton lvlBtn = new JButton("Level Up");
 
     public GameUI() {
-        setTitle("Endless Journey - MVP");
-        setSize(900, 650);
+        setTitle("Adventure Builder");
+        setSize(900, 850);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
         // Scene panel (top center)
-        scenePanel.setPreferredSize(new Dimension(900, 180));
+        scenePanel.setPreferredSize(new Dimension(900, 420));
         add(scenePanel, BorderLayout.NORTH);
 
         // Text area (center)
@@ -146,12 +146,17 @@ public class GameUI extends JFrame {
     }
 
     void showStart() {
-        scenePanel.setScene("Endless Journey", "start");
-        textArea.setText("Welcome to Endless Journey!\n\n"
+        scenePanel.setScene("Adventure Builder", "start");
+        textArea.setText("Welcome to Adventure Builder!\n\n"
                 + "A procedurally generated RPG. Travel through endless locations,\n"
-                + "fight enemies, talk to NPCs, explore ruins.\n\n" + "Death resets everything. Choose wisely.\n\n"
-                + "Stats:\n" + "  STR - damage in combat\n" + "  AGI - block & flee chance\n"
-                + "  INT - persuasion skill\n" + "  END - max HP\n\n" + "Click NEW GAME to begin.");
+                + "fight enemies, talk to NPCs, explore ruins.\n\n"
+                + "Death resets everything. Choose wisely.\n\n"
+                + "Stats:\n"
+                + "  STR - damage in combat\n"
+                + "  AGI - block & flee chance\n"
+                + "  INT - persuasion skill\n"
+                + "  END - max HP\n\n"
+                + "Click NEW GAME to begin.");
         addButton("New Game", e -> {
             eng.newGame();
             updateUI();
@@ -159,7 +164,7 @@ public class GameUI extends JFrame {
     }
 
     void showExplore() {
-        scenePanel.setScene(eng.getCurLoc().getName(), eng.getCurLoc().getType());
+        scenePanel.setScene(eng.getCurLoc().getName(), eng.getCurLoc().getType(), eng.getCurImagePath());
         textArea.setText(eng.formatText(eng.getCurLoc().getDesc()));
         for (LocAct a : eng.getCurLoc().getActions()) {
             addButton(eng.formatText(a.getText()), e -> {
@@ -170,7 +175,7 @@ public class GameUI extends JFrame {
     }
 
     void showCombat() {
-        scenePanel.setScene("Combat: " + eng.getCurEnemy().getName(), "hostile");
+        scenePanel.setScene("Combat: " + eng.getCurEnemy().getName(), "hostile", eng.getCurImagePath());
         StringBuilder sb = new StringBuilder();
         sb.append("Enemy: ")
                 .append(eng.getCurEnemy().getName())
@@ -204,7 +209,7 @@ public class GameUI extends JFrame {
     }
 
     void showDialog() {
-        scenePanel.setScene("Talk: " + eng.getCurDialog().getNpcName(), "peaceful");
+        scenePanel.setScene("Talk: " + eng.getCurDialog().getNpcName(), "peaceful", eng.getCurImagePath());
         StringBuilder sb = new StringBuilder();
         sb.append(eng.getCurDialog().getNpcName()).append(":\n");
         if (eng.getCurNode() != null) {
@@ -236,7 +241,9 @@ public class GameUI extends JFrame {
     void showGameOver() {
         scenePanel.setScene("YOU DIED", "GAMEOVER");
         textArea.setText("Your journey ends here.\nLevel reached: "
-                + eng.getPlayer().getLevel() + "\nGold: " + eng.getPlayer().getGold() + "\n\nAll progress lost.");
+                + eng.getPlayer().getLevel()
+                + "\nGold: " + eng.getPlayer().getGold()
+                + "\n\nAll progress lost.");
         addButton("New Game", e -> {
             eng.newGame();
             updateUI();
