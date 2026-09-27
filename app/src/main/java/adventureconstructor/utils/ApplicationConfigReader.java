@@ -30,7 +30,7 @@ public class ApplicationConfigReader {
 
     private String dbType = "sqlite";
     private String dbDriver = "org.sqlite.JDBC";
-    private String dbAddress = ". ds.db";
+    private String dbAddress = ". ac.db";
     private String dbPort = "";
     private String dbName = "";
     private String dbUser = "";

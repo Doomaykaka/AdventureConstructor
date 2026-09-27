@@ -69,14 +69,14 @@ public class SupportFunctions {
     public static Image getAppIcon() {
         Image appIcon = null;
 
-        URL appIconUrl = SupportFunctions.class.getResource("/deusmatrix/images/app_icon.jpg");
+        URL appIconUrl = SupportFunctions.class.getResource("/adventureconstructor/images/app_icon.jpg");
         appIcon = Toolkit.getDefaultToolkit().getImage(appIconUrl);
 
         return appIcon;
     }
 
     public static ImageIcon getResourceImage(String name) {
-        String path = "deusmatrix/images/" + name;
+        String path = "adventureconstructor/images/" + name;
         URL resourceURL = SupportFunctions.class.getClassLoader().getResource(path);
 
         return new ImageIcon(resourceURL);

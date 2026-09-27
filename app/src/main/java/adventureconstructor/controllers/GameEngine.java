@@ -42,7 +42,26 @@ public class GameEngine {
     private List<String> combatLog = new ArrayList<>();
     private String transitionMsg = "";
 
+    private GameOperationsController gameOperationsController;
+
     private static final String DATA_PARENT_FOLDER_NAME = "user.dir";
+
+    // ---- Контроллер БД ----
+
+    public void setGameOperationsController(GameOperationsController controller) {
+        this.gameOperationsController = controller;
+    }
+
+    private void syncPlayerToDb() {
+        if (player == null || player.getId() == null || gameOperationsController == null) return;
+        try {
+            gameOperationsController.updatePlayer(player.toDb());
+        } catch (Exception e) {
+            System.err.println("Sync player to DB: " + e);
+        }
+    }
+
+    // ---- Загрузка данных ----
 
     @SuppressWarnings("unchecked")
     public void loadData() {
@@ -192,6 +211,7 @@ public class GameEngine {
             System.err.println("Load images: " + e);
         }
 
+        // ---- ambient.json ----
         try {
             Path ambPath = Path.of(Path.of(System.getProperty(DATA_PARENT_FOLDER_NAME), "data/ambient.json")
                     .toFile()
@@ -240,6 +260,8 @@ public class GameEngine {
         return "true".equalsIgnoreCase(v.toString());
     }
 
+    // ---- Игровой цикл ----
+
     public void newGame() {
         setPlayer(new Player());
         genLocation(null);
@@ -252,7 +274,7 @@ public class GameEngine {
         return l.get(rng.nextInt(l.size()));
     }
 
-    void genLocation(String forcedType) {
+    public void genLocation(String forcedType) {
         List<LocTemp> pool = new ArrayList<>();
         for (LocTemp l : locPool) if (forcedType == null || l.getType().equals(forcedType)) pool.add(l);
         if (pool.isEmpty()) pool = locPool;
@@ -266,6 +288,7 @@ public class GameEngine {
             }
         }
 
+        // Если у локации нет явного ambient — берём случайный из пула по типу
         if (cloned.getAmbient() == null || cloned.getAmbient().isEmpty()) {
             List<String> ambs = ambientPool.get(cloned.getType());
             if (ambs != null && !ambs.isEmpty()) {
@@ -275,6 +298,17 @@ public class GameEngine {
 
         setCurLoc(cloned);
     }
+
+    public String getCurImagePath() {
+        if (getCurLoc() == null) return null;
+        String img = getCurLoc().getImage();
+        if (img == null || img.isEmpty()) return null;
+        return Path.of(System.getProperty(DATA_PARENT_FOLDER_NAME), "data", img)
+                .toFile()
+                .getAbsolutePath();
+    }
+
+    // ---- Ambient ----
 
     public void playAmbient(String type) {
         String path = null;
@@ -336,22 +370,16 @@ public class GameEngine {
                 .getAbsolutePath();
     }
 
-    public String getCurImagePath() {
-        if (getCurLoc() == null) return null;
-        String img = getCurLoc().getImage();
-        if (img == null || img.isEmpty()) return null;
-        return Path.of(System.getProperty(DATA_PARENT_FOLDER_NAME), "data", img)
-                .toFile()
-                .getAbsolutePath();
-    }
+    // ---- Смена локации ----
 
-    void enterLoc() {
+    public void enterLoc() {
         if ("peaceful".equals(getCurLoc().getType())) {
             DialogData d = dialogs.get(getCurLoc().getDialogId());
             if (d != null) {
                 setCurDialog(d);
                 setCurNode(d.findNode("start"));
                 setMode("DIALOG");
+                syncPlayerToDb();
                 return;
             }
         }
@@ -365,9 +393,11 @@ public class GameEngine {
                     .add(getCurEnemy().getName() + " (HP: " + getCurEnemy().getHp() + "/"
                             + getCurEnemy().getMaxHp() + ") appears!");
             setMode("COMBAT");
+            syncPlayerToDb();
             return;
         }
         setMode("EXPLORE");
+        syncPlayerToDb();
     }
 
     public String formatText(String text) {
@@ -386,6 +416,7 @@ public class GameEngine {
     }
 
     // ---- Dialog ----
+
     public void chooseOption(DialogOption o) {
         if ("choice".equals(o.getType())) {
             setCurNode(getCurDialog().findNode(o.getNext()));
@@ -431,9 +462,11 @@ public class GameEngine {
         getPlayer().heal(getPlayer().getMaxHp() / 4);
         setTransitionMsg(success ? "Dialog succeeded." : "Dialog failed.");
         setMode("TRANSITION");
+        syncPlayerToDb();
     }
 
     // ---- Combat ----
+
     public void pAttack() {
         int dmg = Math.max(1, getPlayer().atkDmg() - getCurEnemy().getDef());
         if (getCurEnemy().isGuarding()) dmg = Math.max(1, dmg / 2);
@@ -465,6 +498,7 @@ public class GameEngine {
             getPlayer().heal(getPlayer().getMaxHp() / 4);
             setTransitionMsg("Escaped successfully.");
             setMode("TRANSITION");
+            syncPlayerToDb();
         } else {
             getCombatLog().add("Failed to escape!");
             enemyTurn();
@@ -495,6 +529,7 @@ public class GameEngine {
                 setTransitionMsg(
                         getCurEnemy().getName() + " fled! +" + (getCurEnemy().getMaxHp() / 2) + " exp.");
                 setMode("TRANSITION");
+                syncPlayerToDb();
                 return;
             } else getCombatLog().add(getCurEnemy().getName() + " tries to flee but fails!");
         }
@@ -504,7 +539,9 @@ public class GameEngine {
 
     boolean checkCombatEnd() {
         if (getPlayer().getHp() <= 0) {
+            getPlayer().setAlive(false);
             setMode("GAMEOVER");
+            syncPlayerToDb();
             return true;
         }
         if (getCurEnemy().getHp() <= 0) {
@@ -515,16 +552,20 @@ public class GameEngine {
             getPlayer().heal(getPlayer().getMaxHp() / 4);
             setTransitionMsg("Victory! +" + exp + " exp.");
             setMode("TRANSITION");
+            syncPlayerToDb();
             return true;
         }
         return false;
     }
 
     // ---- Exploration ----
+
     public void execAction(LocAct a) {
         String nav = parser.execute(a.getResult(), getPlayer(), this);
         if (getPlayer().getHp() <= 0) {
+            getPlayer().setAlive(false);
             setMode("GAMEOVER");
+            syncPlayerToDb();
             return;
         }
         if (nav == null) nav = a.getNext();
@@ -565,6 +606,8 @@ public class GameEngine {
         }
         getPlayer().getInv().add(it);
     }
+
+    // ---- Геттеры и сеттеры ----
 
     public String getMode() {
         return mode;

@@ -1,9 +1,13 @@
 package adventureconstructor.models;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Player {
+    private Long id = null;
+    private String name = "Hero";
+    private Date creationDate = new Date();
     private int level = 1;
     private int hp = 50;
     private int maxHp = 50;
@@ -15,10 +19,15 @@ public class Player {
     private int agi = 5;
     private int intl = 5;
     private int end = 5;
+    private int score = 0;
+    private boolean alive = true;
+    private String currentLocationId = null;
 
     private List<Item> inv = new ArrayList<>();
     private Item weapon = null;
     private Item armor = null;
+
+    // ---- Бизнес-логика (без изменений) ----
 
     public int atkDmg() {
         return (weapon != null ? weapon.getValue() : 2) + str;
@@ -83,6 +92,135 @@ public class Player {
             armor = it;
         }
         inv.remove(it);
+    }
+
+    // ---- Конверсия: бизнес → DB ----
+
+    public adventureconstructor.models.db.Player toDb() {
+        adventureconstructor.models.db.Player db = new adventureconstructor.models.db.Player();
+
+        if (id != null) db.setId(id);
+        db.setName(name);
+        db.setCreationDate(creationDate);
+        db.setHp(hp);
+        db.setMaxHp(maxHp);
+        db.setGold(gold);
+        db.setLevel(level);
+        db.setExp(exp);
+        db.setExpNext(expNext);
+        db.setSp(sp);
+        db.setStr(str);
+        db.setAgi(agi);
+        db.setIntl(intl);
+        db.setEnd(end);
+        db.setScore(score);
+        db.setAlive(alive);
+        db.setCurrentLocationId(currentLocationId);
+
+        // Инвентарь
+        List<adventureconstructor.models.db.Item> dbInv = new ArrayList<>();
+        for (Item biz : inv) {
+            adventureconstructor.models.db.Item dbItem = biz.toDb();
+            dbItem.setPlayer(db);
+            dbInv.add(dbItem);
+        }
+        db.setInventory(dbInv);
+
+        // weaponId / armorId — по имени предмета в инвентаре
+        if (weapon != null) {
+            for (adventureconstructor.models.db.Item di : dbInv) {
+                if (di.getName().equals(weapon.getName()) && "weapon".equals(di.getType())) {
+                    di.setEquipped(true);
+                    di.setSlot("weapon");
+                    db.setWeaponId(di.getId());
+                    break;
+                }
+            }
+        }
+        if (armor != null) {
+            for (adventureconstructor.models.db.Item di : dbInv) {
+                if (di.getName().equals(armor.getName()) && "armor".equals(di.getType())) {
+                    di.setEquipped(true);
+                    di.setSlot("armor");
+                    db.setArmorId(di.getId());
+                    break;
+                }
+            }
+        }
+
+        return db;
+    }
+
+    // ---- Конверсия: DB → бизнес ----
+
+    public static Player fromDb(adventureconstructor.models.db.Player db) {
+        Player biz = new Player();
+
+        biz.setId(db.getId());
+        biz.setName(db.getName());
+        biz.setCreationDate(db.getCreationDate());
+        biz.setHp(db.getHp());
+        biz.setMaxHp(db.getMaxHp());
+        biz.setGold(db.getGold());
+        biz.setLevel(db.getLevel());
+        biz.setExp(db.getExp());
+        biz.setExpNext(db.getExpNext());
+        biz.setSp(db.getSp());
+        biz.setStr(db.getStr());
+        biz.setAgi(db.getAgi());
+        biz.setIntl(db.getIntl());
+        biz.setEnd(db.getEnd());
+        biz.setScore(db.getScore());
+        biz.setAlive(db.isAlive());
+        biz.setCurrentLocationId(db.getCurrentLocationId());
+
+        List<Item> bizInv = new ArrayList<>();
+        for (adventureconstructor.models.db.Item di : db.getInventory()) {
+            bizInv.add(Item.fromDb(di));
+        }
+        biz.setInv(bizInv);
+
+        // Восстановление weapon/armor по equipped + slot
+        for (int i = 0; i < bizInv.size(); i++) {
+            adventureconstructor.models.db.Item di = db.getInventory().get(i);
+            if (di.isEquipped() && "weapon".equals(di.getSlot())) {
+                biz.setWeapon(bizInv.get(i));
+            } else if (di.isEquipped() && "armor".equals(di.getSlot())) {
+                biz.setArmor(bizInv.get(i));
+            }
+        }
+
+        // Оружие/броня не дублируются в inv
+        if (biz.getWeapon() != null) bizInv.remove(biz.getWeapon());
+        if (biz.getArmor() != null) bizInv.remove(biz.getArmor());
+
+        return biz;
+    }
+
+    // ---- Геттеры и сеттеры (расширенные) ----
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
     }
 
     public int getLevel() {
@@ -171,6 +309,30 @@ public class Player {
 
     public void setEnd(int end) {
         this.end = end;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
+
+    public String getCurrentLocationId() {
+        return currentLocationId;
+    }
+
+    public void setCurrentLocationId(String currentLocationId) {
+        this.currentLocationId = currentLocationId;
     }
 
     public List<Item> getInv() {

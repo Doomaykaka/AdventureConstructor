@@ -32,9 +32,9 @@ public class HibernateConfiguration {
     private static String lastUsedConnectionURL;
 
     private static final String DB_URL_PREFIX = "jdbc:";
-    private static final String DIALECT_NAME = "nail.gun.configurations.SQLiteDialect";
+    private static final String DIALECT_NAME = "adventureconstructor.utils.CustomSQLiteDialect";
     private static final String PERSISTENCE_PROVIDER_NAME = "org.hibernate.jpa.HibernatePersistenceProvider";
-    private static final String PERSISTENCE_UNIT_NAME = "NailGun";
+    private static final String PERSISTENCE_UNIT_NAME = "AdventureConstructor";
     private static final String SQLITE_DB_TYPE = "sqlite";
 
     private static final String DEFAULT_DB_PARENT_FOLDER_NAME = "user.dir";

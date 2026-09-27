@@ -1,10 +1,14 @@
 package adventureconstructor.gui;
 
 import adventureconstructor.controllers.GameEngine;
+import adventureconstructor.controllers.GameOperationsController;
+import adventureconstructor.dao.ItemsDAO;
+import adventureconstructor.dao.PlayersDAO;
 import adventureconstructor.models.DialogOption;
 import adventureconstructor.models.Item;
 import adventureconstructor.models.LocAct;
 import adventureconstructor.models.Player;
+import adventureconstructor.utils.HibernateConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -36,10 +40,14 @@ public class GameUI extends JFrame {
     private JButton invBtn = new JButton("Inventory");
     private JButton lvlBtn = new JButton("Level Up");
 
-    public GameUI() {
+    private Player currentPlayer;
+
+    public GameUI(Player player) {
+        this.currentPlayer = player;
+
         setTitle("Adventure Builder");
         setSize(900, 850);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -85,11 +93,30 @@ public class GameUI extends JFrame {
         actionPanel.setBackground(new Color(30, 30, 40));
         add(actionPanel, BorderLayout.SOUTH);
 
+        // Подключаем контроллер БД к движку
+        PlayersDAO playersDAO = new PlayersDAO(HibernateConfiguration.getEntityManagerFactory());
+        ItemsDAO itemsDAO = new ItemsDAO(HibernateConfiguration.getEntityManagerFactory());
+        eng.setGameOperationsController(new GameOperationsController(playersDAO, itemsDAO));
+
         eng.loadData();
+
+        // Если игрок загружен из БД — сразу стартуем игру
+        if (currentPlayer != null && currentPlayer.getId() != null) {
+            eng.setPlayer(currentPlayer);
+            eng.genLocation(null);
+            eng.enterLoc();
+        }
+
         updateUI();
     }
 
     void updateUI() {
+        // Синхронизируем currentPlayer с движком
+        if (eng.getPlayer() != null) {
+            currentPlayer = eng.getPlayer();
+            SaveLoadWindow.setCurrentPlayer(currentPlayer.toDb());
+        }
+
         updateStats();
         SwingUtilities.invokeLater(() -> {
             actionPanel.removeAll();
@@ -285,6 +312,7 @@ public class GameUI extends JFrame {
                 model.clear();
                 for (Item it2 : eng.getPlayer().getInv()) model.addElement(it2.toString());
                 updateStats();
+                updateUI();
             }
         });
         cl.addActionListener(e -> d.dispose());
@@ -350,9 +378,9 @@ public class GameUI extends JFrame {
                 info.setText("SP: " + eng.getPlayer().getSp());
                 if (eng.getPlayer().getSp() <= 0) {
                     d.dispose();
-                    updateStats();
                 }
                 updateStats();
+                updateUI();
             });
             d.add(b);
         }

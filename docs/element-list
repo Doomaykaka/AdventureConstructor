@@ -1,5 +1,8 @@
 adventureconstructor
 adventureconstructor.controllers
+adventureconstructor.dao
+adventureconstructor.dao.utils
 adventureconstructor.gui
 adventureconstructor.models
+adventureconstructor.models.db
 adventureconstructor.utils

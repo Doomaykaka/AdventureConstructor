@@ -60,3 +60,10 @@ replay_pid*
 
 # Vscode
 .vscode/
+
+# Runtime data
+*.db
+*.db-wal
+*.db-shm
+.gradle-home/
+.tools/
