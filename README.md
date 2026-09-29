@@ -180,7 +180,7 @@ UML схема приложения:
 * **Условия** — тернарный оператор: `hp>20 ? damage3 : tryEscape`
 * **Арифметические операции** — сложение `+`, вычитание `-`, умножение `*`, деление `/`, возведение в степень `^`
 * **Изменения значений** — арифметическое присваивание: `hp+=10`, `gold-=20`, `exp+=scale20`, `str*=2`, `hp/=2`, `str^=2`
-* **Функции** — `randomN`, `damageN`, `healN`, `scaleN`, `scaleRNDN`, `item`, `itemWeapon`, `itemArmor`, `itemConsumable`, `log`, `setVar`, `getVar`, `clearInventory`, `removeWeapon`, `removeArmor`, `hasWeapon`, `hasArmor`, `nextFight`, `nextNPC`, `nextSearch`, `nextRandom`, `nextLocation`, `tryEscape`, `death`, `spN`, `goldN`, `expN`
+* **Функции** — `randomN`, `damageN`, `healN`, `scaleN`, `scaleRNDN`, `item`, `itemWeapon`, `itemArmor`, `itemConsumable`, `log`, `setVar`, `getVar`, `appendVar`, `varEquals`, `varContains`, `stringLength`, `upper`, `lower`, `replace`, `concat`, `trim`, `hasVar`, `removeVar`, `clearInventory`, `removeWeapon`, `removeArmor`, `hasWeapon`, `hasArmor`, `nextFight`, `nextNPC`, `nextSearch`, `nextRandom`, `nextLocation`, `tryEscape`, `death`, `spN`, `goldN`, `expN`
 * **Подстановки в тексте** — `{gold}`, `{hp}`, `{maxHp}`, `{level}`, `{inventorySize}`, `{var:name}`, `{item}`, `{char.str}`, `{char.agi}`, `{char.intl}`, `{char.end}`
 
 Подробное описание каждого источника данных и синтаксиса приведено в подразделах ниже.
@@ -762,6 +762,13 @@ UML схема приложения:
 | `varEquals("имя", "текст")` | значение | Возвращает `1`, если строка переменной точно совпадает с текстом | `varEquals("name", "Алиса")==1 ? log("Привет!") : log("Кто вы?")` |
 | `appendVar("имя", "текст")` | команда | Добавляет текст в конец строковой переменной | `appendVar("name", " Иванова")` |
 | `varContains("имя", "часть")` | значение | Возвращает `1`, если строковая переменная содержит подстроку | `varContains("name", "Иван")==1 ? log("Найдено") : log("Не найдено")` |
+| `concat(a, b, ...)` | строка | Склеивает несколько строковых значений | `concat("Привет, ", getVar("name"))` |
+| `upper(строка)` / `lower(строка)` | строка | Переводит строку в верхний / нижний регистр | `upper(getVar("name"))` |
+| `stringLength(строка)` | значение | Возвращает число символов в строке | `stringLength(getVar("name"))` |
+| `replace(строка, что, на)` | строка | Заменяет все вхождения подстроки | `replace(getVar("name"), "Иван", "Пётр")` |
+| `trim(строка)` | строка | Убирает пробелы в начале и конце | `trim(getVar("name"))` |
+| `hasVar("имя")` | значение | Возвращает `1`, если переменная задана, иначе `0` | `hasVar("name")==1 ? log("Есть имя") : log("Имени нет")` |
+| `removeVar("имя")` | команда | Удаляет пользовательскую переменную | `removeVar("name")` |
 | `inventorySize` | значение | Возвращает количество предметов в инвентаре (без экипировки) | `inventorySize>0 ? log("Инвентарь не пуст") : log("Инвентарь пуст")` |
 | `hasWeapon` | значение | Возвращает `1`, если экипировано оружие, иначе `0` | `hasWeapon==1 ? log("Оружие экипировано") : log("Оружие не экипировано")` |
 | `hasArmor` | значение | Возвращает `1`, если экипирована броня, иначе `0` | `hasArmor==1 ? log("Броня экипирована") : log("Броня не экипирована")` |
@@ -782,6 +789,8 @@ UML схема приложения:
 Функции, возвращающие значение (`randomN`, `scaleN`, `scaleRNDN`, `healN`, `goldN`, `expN`, `spN`, `inventorySize`, `hasWeapon`, `hasArmor`, `getVar("имя")`, `varEquals(...)`, `varContains(...)`), можно использовать в выражениях и условиях: `gold+=scale5*2`, `getVar("questStep")>=2 ? gold+=10 : gold+=1`. Значение числовой переменной можно менять, например, так: `setVar("questStep", getVar("questStep")+1)`. Строку можно сохранить в кавычках, дополнить `appendVar` и вывести через `getVar` или подстановку `{var:имя}`. Сравнение и поиск подстроки чувствительны к регистру. Строковые значения предназначены для текста, а не для арифметики. `hasWeapon` и `hasArmor` возвращают `1` или `0`. В текстах можно вывести размер инвентаря через подстановку `{inventorySize}`. Пользовательские переменные хранятся в течение текущей игры и очищаются при установке нового игрока.
 
 Функции-команды (`damageN`, `item`, `log("текст")`, `nextFight` и т. д.) выполняются как отдельные выражения и не возвращают значение. В полях событий `on_success`, `on_fail`, `on_victory` и в `result` действия навигационные команды `nextFight`, `nextNPC`, `nextSearch`, `nextRandom` и `nextLocation("id")` задают следующую локацию. `nextRandom` выбирает случайную локацию любого типа, а `nextLocation` переходит к локации с указанным `id`. Если указанный `id` отсутствует, переход не выполняется и сообщение об ошибке добавляется в лог. Если навигационная команда не указана, следующая локация выбирается случайно при включённом `auto_transition`. Команда `death` завершает игру.
+
+Строковые функции можно вкладывать и передавать в `setVar`, `appendVar` и `log`: `setVar("fullName", concat(trim(getVar("first")), " ", upper(getVar("last"))))`. Сравнение через `varEquals` и поиск через `varContains` чувствительны к регистру. `stringLength` считает Unicode-кодовые точки.
 
 #### Условия
 

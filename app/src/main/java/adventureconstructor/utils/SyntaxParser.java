@@ -2,7 +2,10 @@ package adventureconstructor.utils;
 
 import adventureconstructor.controllers.GameEngine;
 import adventureconstructor.models.Player;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -34,6 +37,14 @@ public class SyntaxParser {
         "getVar",
         "varEquals",
         "varContains",
+        "stringLength",
+        "upper",
+        "lower",
+        "replace",
+        "concat",
+        "trim",
+        "hasVar",
+        "removeVar",
         "inventorySize",
         "hasWeapon",
         "hasArmor",
@@ -221,12 +232,19 @@ public class SyntaxParser {
                 return 0;
             }
         }
+        if ("stringLength".equals(fn)) {
+            Object value = evaluateStringValue(e);
+            return value instanceof Number ? ((Number) value).intValue() : 0;
+        }
+        if ("hasVar".equals(fn)) {
+            String name = unquote(functionArguments(np).trim());
+            return variables.containsKey(name) ? 1 : 0;
+        }
         if ("varEquals".equals(fn) || "varContains".equals(fn)) {
-            String args = functionArguments(np);
-            int separator = findTopLevelComma(args);
-            if (separator < 0) return 0;
-            String name = unquote(args.substring(0, separator).trim());
-            String expected = resolveStringArgument(args.substring(separator + 1));
+            List<String> args = splitArguments(functionArguments(np));
+            if (args.size() != 2) return 0;
+            String name = unquote(args.get(0));
+            String expected = String.valueOf(evaluateStringValue(args.get(1)));
             Object stored = variables.get(name);
             if (stored == null) return 0;
             String actual = String.valueOf(stored);
@@ -337,7 +355,7 @@ public class SyntaxParser {
                         String name = unquote(args.substring(0, separator).trim());
                         if (name.isEmpty()) return;
                         String current = String.valueOf(variables.getOrDefault(name, ""));
-                        String addition = resolveStringArgument(args.substring(separator + 1));
+                        String addition = String.valueOf(evaluateStringValue(args.substring(separator + 1)));
                         variables.put(name, current + addition);
                         return;
                     }
@@ -348,15 +366,7 @@ public class SyntaxParser {
                         String name = unquote(args.substring(0, separator).trim());
                         if (name.isEmpty()) return;
                         String rawValue = args.substring(separator + 1).trim();
-                        Object value;
-                        if (isQuoted(rawValue)) {
-                            value = unquote(rawValue);
-                        } else {
-                            String referencedName = getVarName(rawValue);
-                            value = referencedName == null
-                                    ? evalValue(rawValue)
-                                    : variables.getOrDefault(referencedName, 0);
-                        }
+                        Object value = evaluateStringValue(rawValue);
                         variables.put(name, value);
                         return;
                     }
@@ -364,14 +374,18 @@ public class SyntaxParser {
                         String message = np.trim();
                         if (message.startsWith("(") && message.endsWith(")"))
                             message = message.substring(1, message.length() - 1).trim();
-                        String referencedName = getVarName(message);
-                        if (referencedName != null) {
-                            message = String.valueOf(variables.getOrDefault(referencedName, 0));
-                        } else if (isQuoted(message)) {
+                        if (isQuoted(message)) {
                             message = message.substring(1, message.length() - 1);
+                        } else {
+                            message = String.valueOf(evaluateStringValue(message));
                         }
                         getEngine().getCombatLog().add(getEngine().formatText(message));
                         return;
+                    case "removeVar": {
+                        String name = unquote(functionArguments(np).trim());
+                        variables.remove(name);
+                        return;
+                    }
                     case "clearInventory":
                         getPlayer().getInv().clear();
                         return;
@@ -475,20 +489,83 @@ public class SyntaxParser {
                 && ((text.startsWith("\"") && text.endsWith("\"")) || (text.startsWith("'") && text.endsWith("'")));
     }
 
-    private String getVarName(String expression) {
-        String text = expression.trim();
-        if (!text.startsWith("getVar") || !text.endsWith(")")) return null;
-        String arguments = functionArguments(text.substring("getVar".length()));
-        if (findTopLevelComma(arguments) >= 0) return null;
-        return unquote(arguments);
+    private String resolveStringArgument(String argument) {
+        return String.valueOf(evaluateStringValue(argument));
     }
 
-    private String resolveStringArgument(String argument) {
-        String value = argument.trim();
+    private Object evaluateStringValue(String expression) {
+        String value = expression.trim();
         if (isQuoted(value)) return unquote(value);
-        String name = getVarName(value);
-        if (name != null) return String.valueOf(variables.getOrDefault(name, ""));
-        return value;
+
+        int open = value.indexOf('(');
+        if (open > 0 && value.endsWith(")")) {
+            String name = value.substring(0, open).trim();
+            List<String> args = splitArguments(value.substring(open + 1, value.length() - 1));
+            switch (name) {
+                case "getVar":
+                    return args.size() == 1 ? variables.getOrDefault(unquote(args.get(0)), 0) : 0;
+                case "concat": {
+                    StringBuilder result = new StringBuilder();
+                    for (String arg : args) result.append(evaluateStringValue(arg));
+                    return result.toString();
+                }
+                case "upper":
+                    return args.size() == 1
+                            ? String.valueOf(evaluateStringValue(args.get(0))).toUpperCase(Locale.ROOT)
+                            : "";
+                case "lower":
+                    return args.size() == 1
+                            ? String.valueOf(evaluateStringValue(args.get(0))).toLowerCase(Locale.ROOT)
+                            : "";
+                case "trim":
+                    return args.size() == 1
+                            ? String.valueOf(evaluateStringValue(args.get(0))).trim()
+                            : "";
+                case "replace":
+                    if (args.size() != 3) return "";
+                    return String.valueOf(evaluateStringValue(args.get(0)))
+                            .replace(
+                                    String.valueOf(evaluateStringValue(args.get(1))),
+                                    String.valueOf(evaluateStringValue(args.get(2))));
+                case "stringLength":
+                    if (args.size() != 1) return 0;
+                    String measured = String.valueOf(evaluateStringValue(args.get(0)));
+                    return measured.codePointCount(0, measured.length());
+                case "varEquals":
+                case "varContains":
+                    return evalFunc(value, name);
+                case "hasVar":
+                    return evalFunc(value, name);
+                default:
+                    break;
+            }
+        }
+        return evalValue(value);
+    }
+
+    private List<String> splitArguments(String arguments) {
+        List<String> result = new ArrayList<>();
+        if (arguments.trim().isEmpty()) return result;
+        int start = 0;
+        int depth = 0;
+        char quote = 0;
+        for (int i = 0; i < arguments.length(); i++) {
+            char c = arguments.charAt(i);
+            if (quote != 0) {
+                if (c == quote) quote = 0;
+            } else if (c == '\"' || c == '\'') {
+                quote = c;
+            } else if (c == '(') {
+                depth++;
+            } else if (c == ')') {
+                depth--;
+            } else if (c == ',' && depth == 0) {
+                result.add(arguments.substring(start, i).trim());
+                start = i + 1;
+            }
+        }
+        result.add(arguments.substring(start).trim());
+        return result;
     }
 
     public String formatVariables(String text) {
