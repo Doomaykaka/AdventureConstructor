@@ -10,6 +10,7 @@ public class LocTemp {
     private String desc;
     private String image = "";
     private String ambient = "";
+    private boolean autoTransition = true;
 
     private String npcName;
     private String dialogId;
@@ -160,6 +161,14 @@ public class LocTemp {
 
     public void setAmbient(String ambient) {
         this.ambient = ambient;
+    }
+
+    public boolean isAutoTransition() {
+        return autoTransition;
+    }
+
+    public void setAutoTransition(boolean autoTransition) {
+        this.autoTransition = autoTransition;
     }
 
     public boolean isScaleEnemy() {

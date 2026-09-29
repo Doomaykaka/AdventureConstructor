@@ -201,6 +201,7 @@ public class GameUI extends JFrame {
                 eng.getCurImagePath(),
                 eng.formatText(eng.getCurLoc().getDesc()));
         textArea.setText(eng.formatText(eng.getCurLoc().getDesc()));
+        appendLocationLog();
         for (LocAct a : eng.getCurLoc().getActions()) {
             addButton(eng.formatText(a.getText()), e -> {
                 eng.execAction(a);
@@ -257,6 +258,7 @@ public class GameUI extends JFrame {
         sb.append(eng.getCurDialog().getNpcName()).append(":\n");
         if (eng.getCurNode() != null) {
             sb.append(eng.formatText(eng.getCurNode().getText())).append("\n");
+            for (String log : eng.getCombatLog()) sb.append("\n").append(log);
             textArea.setText(sb.toString());
             int idx = 1;
             for (DialogOption o : eng.getCurNode().getOptions()) {
@@ -275,10 +277,21 @@ public class GameUI extends JFrame {
         scenePanel.setScene("...", "");
         textArea.setText(
                 eng.getTransitionMsg() + "\n\nHP restored: +" + eng.getPlayer().getMaxHp() / 4);
-        addButton("Continue", e -> {
-            eng.continueAfterTransition();
-            updateUI();
-        });
+        appendLocationLog();
+        if (eng.canContinueAfterTransition()) {
+            addButton("Continue", e -> {
+                eng.continueAfterTransition();
+                updateUI();
+            });
+        }
+    }
+
+    private void appendLocationLog() {
+        if (eng.getCombatLog().isEmpty()) return;
+        StringBuilder sb = new StringBuilder(textArea.getText());
+        sb.append("\n\n");
+        for (String log : eng.getCombatLog()) sb.append(log).append("\n");
+        textArea.setText(sb.toString());
     }
 
     void showGameOver() {

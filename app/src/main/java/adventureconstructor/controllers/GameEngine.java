@@ -98,6 +98,7 @@ public class GameEngine {
                     l.setDesc(jStr(lm, "description", ""));
                     l.setImage(jStr(lm, "image", ""));
                     l.setAmbient(jStr(lm, "ambient", ""));
+                    l.setAutoTransition(jBool(lm, "auto_transition", true));
                     if ("peaceful".equals(l.getType())) {
                         l.setNpcName(jStr(lm, "npc_name", ""));
                         l.setDialogId(jStr(lm, "dialog_id", ""));
@@ -394,6 +395,8 @@ public class GameEngine {
             return;
         }
 
+        getCombatLog().clear();
+
         if ("peaceful".equals(getCurLoc().getType())) {
             DialogData d = dialogs.get(getCurLoc().getDialogId());
             if (d != null) {
@@ -415,7 +418,6 @@ public class GameEngine {
                 getCurEnemy().scale(getPlayer().getLevel());
             }
             playerGuarding = false;
-            getCombatLog().clear();
             getCombatLog()
                     .add(getCurEnemy().getName() + " (HP: " + getCurEnemy().getHp() + "/"
                             + getCurEnemy().getMaxHp() + ") appears!");
@@ -491,6 +493,13 @@ public class GameEngine {
         else if (!success && getCurLoc().getOnFail() != null)
             transitionNavigation = parser.execute(getCurLoc().getOnFail(), getPlayer(), this);
         getPlayer().heal(getPlayer().getMaxHp() / 4);
+        if ((transitionNavigation == null || transitionNavigation.trim().isEmpty())
+                && !getCurLoc().isAutoTransition()) {
+            incScore();
+            syncPlayerToDb();
+            setMode("DIALOG");
+            return;
+        }
         setTransitionMsg(success ? "Dialog succeeded." : "Dialog failed.");
         setMode("TRANSITION");
         incScore();
@@ -603,6 +612,10 @@ public class GameEngine {
         if (nav == null) nav = a.getNext();
         getPlayer().heal(getPlayer().getMaxHp() / 4);
         incScore();
+        if ((nav == null || nav.trim().isEmpty()) && !getCurLoc().isAutoTransition()) {
+            syncPlayerToDb();
+            return;
+        }
         if ("nextFight".equals(nav)) genLocation("hostile");
         else if ("nextNPC".equals(nav)) genLocation("peaceful");
         else if ("nextSearch".equals(nav)) genLocation("exploratory");
@@ -612,6 +625,7 @@ public class GameEngine {
 
     public void continueAfterTransition() {
         String nav = transitionNavigation;
+        if ((nav == null || nav.trim().isEmpty()) && !getCurLoc().isAutoTransition()) return;
         transitionNavigation = null;
         if ("death".equals(nav)) {
             getPlayer().setAlive(false);
@@ -621,6 +635,12 @@ public class GameEngine {
         }
         genLocation(locationTypeForNavigation(nav));
         enterLoc();
+    }
+
+    public boolean canContinueAfterTransition() {
+        return transitionNavigation != null && !transitionNavigation.trim().isEmpty()
+                || getCurLoc() == null
+                || getCurLoc().isAutoTransition();
     }
 
     private String locationTypeForNavigation(String nav) {

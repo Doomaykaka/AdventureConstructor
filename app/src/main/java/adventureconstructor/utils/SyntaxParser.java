@@ -12,6 +12,7 @@ public class SyntaxParser {
 
     private static String[] funcs = {
         "clearInventory",
+        "log",
         "removeWeapon",
         "removeArmor",
         "itemConsumable",
@@ -291,6 +292,16 @@ public class SyntaxParser {
                     } catch (Exception x) {
                     }
                 switch (fn) {
+                    case "log":
+                        String message = np.trim();
+                        if (message.startsWith("(") && message.endsWith(")"))
+                            message = message.substring(1, message.length() - 1).trim();
+                        if (message.length() >= 2
+                                && ((message.startsWith("\"") && message.endsWith("\""))
+                                        || (message.startsWith("'") && message.endsWith("'"))))
+                            message = message.substring(1, message.length() - 1);
+                        getEngine().getCombatLog().add(getEngine().formatText(message));
+                        return;
                     case "clearInventory":
                         getPlayer().getInv().clear();
                         return;

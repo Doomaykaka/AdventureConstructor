@@ -5,19 +5,21 @@
       "type": "hostile",
       "name": "Тестовый бой",
       "description": "Проверка перехода nextNPC после победы.",
+      "auto_transition": false,
       "enemy_name": "Слабый тестовый противник",
       "enemy_hp": 4,
       "enemy_damage": 1,
       "enemy_defense": 0,
       "scale_enemy": false,
-      "on_victory": "nextNPC",
-      "on_defeat": "death"
+      "on_victory": "",
+      "on_defeat": ""
     },
     {
       "id": "test_npc",
       "type": "peaceful",
       "name": "Тестовая мирная локация",
       "description": "Мирная локация после боя.",
+      "auto_transition": false,
       "npc_name": "Тестовый NPC",
       "dialog_id": "test_dialog"
     },
@@ -26,21 +28,23 @@
       "type": "exploratory",
       "name": "Заброшенный лагерь",
       "description": "Среди развалин лагеря видны следы недавней стоянки и закрытый дорожный сундук.",
+      "auto_transition": false,
       "actions": [
         {
+          "text": "Проверить вывод текста в лог",
+          "result": "log(\"Сообщение добавлено кнопкой из исследовательской локации. Текущее HP: {hp}\")"
+        },
+        {
           "text": "Осмотреть дорожный сундук",
-          "result": "gold+=5",
-          "next": "nextSearch"
+          "result": "gold+=5"
         },
         {
           "text": "Вернуться к торговцу",
-          "result": "",
-          "next": "nextNPC"
+          "result": "nextNPC"
         },
         {
           "text": "Пойти по следам в чащу",
-          "result": "",
-          "next": "nextFight"
+          "result": ""
         }
       ]
     }
