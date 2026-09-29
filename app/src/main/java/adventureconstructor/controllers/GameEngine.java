@@ -42,6 +42,7 @@ public class GameEngine {
     private boolean playerGuarding = false;
     private List<String> combatLog = new ArrayList<>();
     private String transitionMsg = "";
+    private String transitionNavigation;
 
     private String lastAmbientKey = null;
 
@@ -486,9 +487,9 @@ public class GameEngine {
 
     void endDialog(boolean success) {
         if (success && getCurLoc().getOnSuccess() != null)
-            parser.execute(getCurLoc().getOnSuccess(), getPlayer(), this);
+            transitionNavigation = parser.execute(getCurLoc().getOnSuccess(), getPlayer(), this);
         else if (!success && getCurLoc().getOnFail() != null)
-            parser.execute(getCurLoc().getOnFail(), getPlayer(), this);
+            transitionNavigation = parser.execute(getCurLoc().getOnFail(), getPlayer(), this);
         getPlayer().heal(getPlayer().getMaxHp() / 4);
         setTransitionMsg(success ? "Dialog succeeded." : "Dialog failed.");
         setMode("TRANSITION");
@@ -579,7 +580,8 @@ public class GameEngine {
             int exp = getCurEnemy().getMaxHp()
                     + (getPlayer().getMaxHp() - getPlayer().getHp());
             getPlayer().gainExp(exp);
-            if (getCurLoc().getOnVictory() != null) parser.execute(getCurLoc().getOnVictory(), getPlayer(), this);
+            if (getCurLoc().getOnVictory() != null)
+                transitionNavigation = parser.execute(getCurLoc().getOnVictory(), getPlayer(), this);
             getPlayer().heal(getPlayer().getMaxHp() / 4);
             setTransitionMsg("Victory! +" + exp + " exp.");
             setMode("TRANSITION");
@@ -609,8 +611,23 @@ public class GameEngine {
     }
 
     public void continueAfterTransition() {
-        genLocation(null);
+        String nav = transitionNavigation;
+        transitionNavigation = null;
+        if ("death".equals(nav)) {
+            getPlayer().setAlive(false);
+            setMode("GAMEOVER");
+            syncPlayerToDb();
+            return;
+        }
+        genLocation(locationTypeForNavigation(nav));
         enterLoc();
+    }
+
+    private String locationTypeForNavigation(String nav) {
+        if ("nextFight".equals(nav)) return "hostile";
+        if ("nextNPC".equals(nav)) return "peaceful";
+        if ("nextSearch".equals(nav)) return "exploratory";
+        return null;
     }
 
     public void genItem(String type) {

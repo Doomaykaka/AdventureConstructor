@@ -1,57 +1,13 @@
 {
-	"dialog_elder": {
-    "npc_name": "Старая Эльза",
-    "greeting": "А, путник... Далеко ли собрался?",
+  "test_dialog": {
+    "npc_name": "Тестовый NPC",
+    "greeting": "Проверка перехода завершена.",
     "nodes": [
       {
         "id": "start",
-        "text": "Чего тебе нужно? Я стара и не люблю гостей.",
-        "options": [
-          {
-            "text": "Поделись мудростью, бабушка.",
-            "type": "choice",
-            "next": "wisdom"
-          },
-          {
-            "text": "Дай мне еду и питьё.",
-            "type": "choice",
-            "next": "refuse"
-          },
-          {
-            "text": "[Убеждение] Тебе выгоднее помочь мне.",
-            "type": "dice",
-            "skill": "persuasion",
-            "dc": 12,
-            "success": "wisdom",
-            "fail": "refuse"
-          },
-          {
-            "text": "Уйду, не хочу мешать.",
-            "type": "choice",
-            "next": "leave"
-          }
-        ]
-      },
-      {
-        "id": "wisdom",
-        "text": "Хм... Ладно. Впереди будет развилка. Правая тропа безопаснее. Вот тебе травы.",
-        "reward": "exp+=15; hp+=heal10",
-        "success": true,
-        "end_dialog": true
-      },
-      {
-        "id": "refuse",
-        "text": "Нет у меня ничего для тебя. Уходи.",
-        "success": false,
-        "end_dialog": true
-      },
-      {
-        "id": "leave",
-        "text": "Мудрый выбор. Бери с миром.",
-        "reward": "exp+=5",
-        "success": true,
-        "end_dialog": true
+        "text": "Успех: после боевой локации открылась мирная локация через nextNPC.",
+        "options": []
       }
     ]
-  },
+  }
 }

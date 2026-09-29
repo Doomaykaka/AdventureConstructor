@@ -1,11 +1,1 @@
-{
-  "peaceful": [
-    "scambient/pieceful.wav",
-  ],
-  "hostile": [
-    "scambient/enemy.wav",
-  ],
-  "exploratory": [
-    "scambient/explore.wav",
-  ]
-}
+{}

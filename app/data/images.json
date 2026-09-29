@@ -1,11 +1,1 @@
-{
-  "peaceful": [
-    "scimages/pieceful.jpg",
-  ],
-  "hostile": [
-    "scimages/enemy.jpg",
-  ],
-  "exploratory": [
-    "scimages/explore.jpg",
-  ]
-}
+{}

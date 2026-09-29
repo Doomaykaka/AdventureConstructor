@@ -1,79 +1,25 @@
 {
   "locations": [
-	{
-      "id": "village",
+    {
+      "id": "test_battle",
+      "type": "hostile",
+      "name": "Тестовый бой",
+      "description": "Проверка перехода nextNPC после победы.",
+      "enemy_name": "Слабый тестовый противник",
+      "enemy_hp": 4,
+      "enemy_damage": 1,
+      "enemy_defense": 0,
+      "scale_enemy": false,
+      "on_victory": "nextNPC",
+      "on_defeat": "death"
+    },
+    {
+      "id": "test_npc",
       "type": "peaceful",
-      "name": "Деревня у переправы",
-      "description": "Небольшая деревня у реки. У костра сидит старуха и смотрит на огонь.",
-      "npc_name": "Старая Эльза",
-      "dialog_id": "dialog_elder",
-      "on_success": "exp+=15; hp+=heal10",
-      "on_fail": "hp-=damage3"
-    },
-	{
-      "id": "ruins",
-      "type": "exploratory",
-      "name": "Обваленные стены",
-      "description": "Полузасыпанный коридор старых руин. В углу - камень, у стены - сундук.",
-      "actions": [
-        {
-          "text": "Осмотреть сундук",
-          "result": "gold+=random20; exp+=10",
-          "next": "nextSearch"
-        },
-        {
-          "text": "Отодвинуть камень",
-          "result": "hp-=damage5; gold+=scale10",
-          "next": "nextFight"
-        },
-        {
-          "text": "Пройти дальше тихо",
-          "result": "exp+=5",
-          "next": "nextNPC"
-        }
-      ]
-    },
-	{
-      "id": "library",
-      "type": "hostile",
-      "name": "Библиотека",
-	  "image": "scimages/ork.jpg",
-      "description": "За рукописями присматривал зловонный страж.",
-      "enemy_name": "Орк",
-      "enemy_hp": 15,
-      "enemy_damage": 16,
-      "enemy_defense": 13,
-	  "scale_enemy": false,
-      "on_victory": "exp+=scale100; gold+=random15; random10>6 ? itemWeapon : itemConsumable; random10>6 ? itemArmor : itemConsumable",
-      "on_defeat": "death"
-    },
-	{
-      "id": "desert_charoms",
-      "type": "hostile",
-      "name": "Пустынные харомы",
-	  "image": "scimages/aarakokra.jpg",
-      "description": "Пустынный храм был недосягаем для путников из-за стража ветров.",
-      "enemy_name": "Ааракокра",
-      "enemy_hp": 13,
-      "enemy_damage": 10,
-      "enemy_defense": 12,
-	  "scale_enemy": false,
-      "on_victory": "exp+=scale100; gold+=random15; random10>6 ? itemWeapon : itemConsumable; random10>6 ? itemArmor : itemConsumable",
-      "on_defeat": "death"
-    },
-	{
-      "id": "underground_lake",
-      "type": "hostile",
-      "name": "Подземно озеро",
-	  "image": "scimages/abolet.jpg",
-      "description": "На поверхности чистого подземного озера появилась рябь.",
-      "enemy_name": "Аболет",
-      "enemy_hp": 135,
-      "enemy_damage": 21,
-      "enemy_defense": 17,
-	  "scale_enemy": false,
-      "on_victory": "exp+=scale100; gold+=random15; random10>6 ? itemWeapon : itemConsumable; random10>6 ? itemArmor : itemConsumable",
-      "on_defeat": "death"
-    },
+      "name": "Тестовая мирная локация",
+      "description": "Мирная локация после боя.",
+      "npc_name": "Тестовый NPC",
+      "dialog_id": "test_dialog"
+    }
   ]
 }
