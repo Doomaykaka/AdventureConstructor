@@ -124,6 +124,8 @@ public class SyntaxParser {
                 return getPlayer().getLevel();
             case "exp":
                 return getPlayer().getExp();
+            case "score":
+                return getPlayer().getScore();
             case "sp":
                 return getPlayer().getSp();
             case "str":
@@ -146,6 +148,7 @@ public class SyntaxParser {
         if ("hp".equals(tgt) || "char.hp".equals(tgt)) getPlayer().setHp(v);
         else if ("gold".equals(tgt)) getPlayer().setGold(v);
         else if ("exp".equals(tgt)) getPlayer().setExp(v);
+        else if ("score".equals(tgt)) getPlayer().setScore(v);
         else if ("sp".equals(tgt)) getPlayer().setSp(v);
         else if ("str".equals(tgt) || "char.str".equals(tgt)) getPlayer().setStr(v);
         else if ("agi".equals(tgt) || "char.agi".equals(tgt)) getPlayer().setAgi(v);
