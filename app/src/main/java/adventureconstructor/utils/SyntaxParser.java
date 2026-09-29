@@ -11,6 +11,7 @@ public class SyntaxParser {
     private String nav = null;
 
     private static String[] funcs = {
+        "clearInventory",
         "itemConsumable",
         "itemWeapon",
         "itemArmor",
@@ -285,6 +286,9 @@ public class SyntaxParser {
                     } catch (Exception x) {
                     }
                 switch (fn) {
+                    case "clearInventory":
+                        getPlayer().getInv().clear();
+                        return;
                     case "nextFight":
                         nav = "nextFight";
                         return;

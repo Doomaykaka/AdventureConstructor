@@ -90,8 +90,8 @@ public class ScenePanel extends JPanel {
         int descriptionHeight = descriptionLines.size() * 20;
         int typeGap = 5;
         int typeHeight = 16;
-        int cardHeight = topPadding + titleHeight + descriptionGap + descriptionHeight + typeGap
-                + typeHeight + bottomPadding;
+        int cardHeight =
+                topPadding + titleHeight + descriptionGap + descriptionHeight + typeGap + typeHeight + bottomPadding;
         int cardY = getHeight() - cardHeight - 18;
 
         int gradientY = Math.max(0, cardY - 55);
