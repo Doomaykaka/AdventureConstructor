@@ -12,6 +12,8 @@ public class SyntaxParser {
 
     private static String[] funcs = {
         "clearInventory",
+        "removeWeapon",
+        "removeArmor",
         "itemConsumable",
         "itemWeapon",
         "itemArmor",
@@ -288,6 +290,12 @@ public class SyntaxParser {
                 switch (fn) {
                     case "clearInventory":
                         getPlayer().getInv().clear();
+                        return;
+                    case "removeWeapon":
+                        getPlayer().setWeapon(null);
+                        return;
+                    case "removeArmor":
+                        getPlayer().setArmor(null);
                         return;
                     case "nextFight":
                         nav = "nextFight";

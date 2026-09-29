@@ -180,7 +180,7 @@ UML схема приложения:
 * **Условия** — тернарный оператор: `hp>20 ? damage3 : tryEscape`
 * **Арифметические операции** — сложение `+`, вычитание `-`, умножение `*`, деление `/`, возведение в степень `^`
 * **Изменения значений** — арифметическое присваивание: `hp+=10`, `gold-=20`, `exp+=scale20`, `str*=2`, `hp/=2`, `str^=2`
-* **Функции** — `randomN`, `damageN`, `healN`, `scaleN`, `scaleRNDN`, `item`, `itemWeapon`, `itemArmor`, `itemConsumable`, `clearInventory`, `nextFight`, `nextNPC`, `nextSearch`, `tryEscape`, `death`, `spN`, `goldN`, `expN`
+* **Функции** — `randomN`, `damageN`, `healN`, `scaleN`, `scaleRNDN`, `item`, `itemWeapon`, `itemArmor`, `itemConsumable`, `clearInventory`, `removeWeapon`, `removeArmor`, `nextFight`, `nextNPC`, `nextSearch`, `tryEscape`, `death`, `spN`, `goldN`, `expN`
 * **Подстановки в тексте** — `{gold}`, `{hp}`, `{maxHp}`, `{level}`, `{item}`, `{char.str}`, `{char.agi}`, `{char.intl}`, `{char.end}`
 
 Подробное описание каждого источника данных и синтаксиса приведено в подразделах ниже.
@@ -755,6 +755,8 @@ UML схема приложения:
 | `itemArmor` | команда | Создаёт случайную броню | `itemArmor` |
 | `itemConsumable` | команда | Создаёт случайный расходник | `itemConsumable` |
 | `clearInventory` | команда | Удаляет все предметы из инвентаря, сохраняя экипированные оружие и броню | `clearInventory` |
+| `removeWeapon` | команда | Удаляет экипированное оружие | `removeWeapon` |
+| `removeArmor` | команда | Удаляет экипированную броню | `removeArmor` |
 | `nextFight` | навигация | Переход к враждебной локации | `nextFight` |
 | `nextNPC` | навигация | Переход к мирной локации | `nextNPC` |
 | `nextSearch` | навигация | Переход к исследовательской локации | `nextSearch` |
