@@ -2,6 +2,8 @@ package adventureconstructor.utils;
 
 import adventureconstructor.controllers.GameEngine;
 import adventureconstructor.models.Player;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class SyntaxParser {
@@ -9,6 +11,7 @@ public class SyntaxParser {
     private Player player;
     private GameEngine engine;
     private String nav = null;
+    private final Map<String, Integer> variables = new HashMap<>();
 
     private static String[] funcs = {
         "clearInventory",
@@ -26,6 +29,8 @@ public class SyntaxParser {
         "scaleRND",
         "nextNPC",
         "random",
+        "setVar",
+        "getVar",
         "inventorySize",
         "hasWeapon",
         "hasArmor",
@@ -203,6 +208,10 @@ public class SyntaxParser {
                 n = Integer.parseInt(np);
             } catch (Exception x) {
             }
+        if ("getVar".equals(fn)) {
+            String name = unquote(functionArguments(np).trim());
+            return variables.getOrDefault(name, 0);
+        }
         if ("inventorySize".equals(fn)) return getPlayer().getInv().size();
         if ("hasWeapon".equals(fn)) return getPlayer().getWeapon() != null ? 1 : 0;
         if ("hasArmor".equals(fn)) return getPlayer().getArmor() != null ? 1 : 0;
@@ -300,6 +309,16 @@ public class SyntaxParser {
                     } catch (Exception x) {
                     }
                 switch (fn) {
+                    case "setVar": {
+                        String args = functionArguments(np);
+                        int separator = findTopLevelComma(args);
+                        if (separator < 0) return;
+                        String name = unquote(args.substring(0, separator).trim());
+                        if (name.isEmpty()) return;
+                        int value = evalValue(args.substring(separator + 1));
+                        variables.put(name, value);
+                        return;
+                    }
                     case "log":
                         String message = np.trim();
                         if (message.startsWith("(") && message.endsWith(")"))
@@ -389,6 +408,46 @@ public class SyntaxParser {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    private String functionArguments(String suffix) {
+        String args = suffix.trim();
+        if (args.startsWith("(") && args.endsWith(")"))
+            return args.substring(1, args.length() - 1).trim();
+        return args;
+    }
+
+    private String unquote(String value) {
+        String result = value.trim();
+        if (result.length() >= 2
+                && ((result.startsWith("\"") && result.endsWith("\""))
+                        || (result.startsWith("'") && result.endsWith("'"))))
+            return result.substring(1, result.length() - 1);
+        return result;
+    }
+
+    private int findTopLevelComma(String value) {
+        int depth = 0;
+        char quote = 0;
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (quote != 0) {
+                if (c == quote) quote = 0;
+            } else if (c == '\"' || c == '\'') {
+                quote = c;
+            } else if (c == '(') {
+                depth++;
+            } else if (c == ')') {
+                depth--;
+            } else if (c == ',' && depth == 0) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public void clearVariables() {
+        variables.clear();
     }
 
     public GameEngine getEngine() {

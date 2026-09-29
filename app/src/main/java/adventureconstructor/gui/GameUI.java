@@ -13,6 +13,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
@@ -36,6 +37,7 @@ public class GameUI extends JFrame {
     private JTextArea textArea = new JTextArea();
     private JPanel statsPanel = new JPanel();
     private JPanel actionPanel = new JPanel();
+    private JScrollPane actionScrollPane;
     private JLabel[] statLabels = new JLabel[12];
     private JButton invBtn = new JButton("Inventory");
     private JButton lvlBtn = new JButton("Level Up");
@@ -93,7 +95,12 @@ public class GameUI extends JFrame {
 
         actionPanel.setPreferredSize(new Dimension(900, 60));
         actionPanel.setBackground(new Color(30, 30, 40));
-        add(actionPanel, BorderLayout.SOUTH);
+        actionPanel.setLayout(new FlowLayout());
+        actionScrollPane = new JScrollPane(actionPanel);
+        actionScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        actionScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        actionScrollPane.setPreferredSize(new Dimension(900, 60));
+        add(actionScrollPane, BorderLayout.SOUTH);
     }
 
     private void loadData() {
@@ -119,6 +126,12 @@ public class GameUI extends JFrame {
         updateStats();
         SwingUtilities.invokeLater(() -> {
             actionPanel.removeAll();
+            boolean scrollActions = "EXPLORE".equals(eng.getMode())
+                    && eng.getCurLoc() != null
+                    && "exploratory".equals(eng.getCurLoc().getType());
+            actionPanel.setLayout(scrollActions ? new BoxLayout(actionPanel, BoxLayout.Y_AXIS) : new FlowLayout());
+            actionPanel.setPreferredSize(scrollActions ? null : new Dimension(900, 60));
+            actionScrollPane.setPreferredSize(new Dimension(900, scrollActions ? 180 : 60));
             textArea.setText("");
 
             eng.playAmbientForMode();
@@ -145,6 +158,8 @@ public class GameUI extends JFrame {
             }
             actionPanel.revalidate();
             actionPanel.repaint();
+            actionScrollPane.revalidate();
+            actionScrollPane.repaint();
         });
     }
 
@@ -178,6 +193,10 @@ public class GameUI extends JFrame {
         JButton b = new JButton(label);
         b.addActionListener(al);
         b.setPreferredSize(new Dimension(160, 35));
+        if (actionPanel.getLayout() instanceof BoxLayout) {
+            if (actionPanel.getComponentCount() > 0) actionPanel.add(Box.createVerticalStrut(6));
+            b.setAlignmentX(Component.CENTER_ALIGNMENT);
+        }
         actionPanel.add(b);
     }
 

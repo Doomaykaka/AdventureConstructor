@@ -180,7 +180,7 @@ UML схема приложения:
 * **Условия** — тернарный оператор: `hp>20 ? damage3 : tryEscape`
 * **Арифметические операции** — сложение `+`, вычитание `-`, умножение `*`, деление `/`, возведение в степень `^`
 * **Изменения значений** — арифметическое присваивание: `hp+=10`, `gold-=20`, `exp+=scale20`, `str*=2`, `hp/=2`, `str^=2`
-* **Функции** — `randomN`, `damageN`, `healN`, `scaleN`, `scaleRNDN`, `item`, `itemWeapon`, `itemArmor`, `itemConsumable`, `log`, `clearInventory`, `removeWeapon`, `removeArmor`, `hasWeapon`, `hasArmor`, `nextFight`, `nextNPC`, `nextSearch`, `nextRandom`, `nextLocation`, `tryEscape`, `death`, `spN`, `goldN`, `expN`
+* **Функции** — `randomN`, `damageN`, `healN`, `scaleN`, `scaleRNDN`, `item`, `itemWeapon`, `itemArmor`, `itemConsumable`, `log`, `setVar`, `getVar`, `clearInventory`, `removeWeapon`, `removeArmor`, `hasWeapon`, `hasArmor`, `nextFight`, `nextNPC`, `nextSearch`, `nextRandom`, `nextLocation`, `tryEscape`, `death`, `spN`, `goldN`, `expN`
 * **Подстановки в тексте** — `{gold}`, `{hp}`, `{maxHp}`, `{level}`, `{inventorySize}`, `{item}`, `{char.str}`, `{char.agi}`, `{char.intl}`, `{char.end}`
 
 Подробное описание каждого источника данных и синтаксиса приведено в подразделах ниже.
@@ -756,6 +756,8 @@ UML схема приложения:
 | `itemArmor` | команда | Создаёт случайную броню | `itemArmor` |
 | `itemConsumable` | команда | Создаёт случайный расходник | `itemConsumable` |
 | `log("текст")` | команда | Добавляет текст в лог текущей локации | `log("Вы нашли тайный проход")` |
+| `setVar("имя", значение)` | команда | Сохраняет числовую пользовательскую переменную | `setVar("questStep", 2)` |
+| `getVar("имя")` | значение | Возвращает пользовательскую переменную (для неустановленной возвращает `0`) | `getVar("questStep")` |
 | `inventorySize` | значение | Возвращает количество предметов в инвентаре (без экипировки) | `inventorySize>0 ? log("Инвентарь не пуст") : log("Инвентарь пуст")` |
 | `hasWeapon` | значение | Возвращает `1`, если экипировано оружие, иначе `0` | `hasWeapon==1 ? log("Оружие экипировано") : log("Оружие не экипировано")` |
 | `hasArmor` | значение | Возвращает `1`, если экипирована броня, иначе `0` | `hasArmor==1 ? log("Броня экипирована") : log("Броня не экипирована")` |
@@ -773,7 +775,7 @@ UML схема приложения:
 | `expN` | значение | Возвращает N (для использования в выражениях) | `exp+=exp100` |
 | `spN` | значение | Возвращает N (для использования в выражениях) | `sp+=sp3` |
 
-Функции, возвращающие значение (`randomN`, `scaleN`, `scaleRNDN`, `healN`, `goldN`, `expN`, `spN`, `inventorySize`, `hasWeapon`, `hasArmor`), могут использоваться внутри арифметических выражений и условий: `gold+=scale5*2`, `hp-=random10+5`, `inventorySize>0 ? gold+=10 : gold+=1`. `hasWeapon` и `hasArmor` возвращают `1` или `0`. В текстах можно вывести значение инвентаря через подстановку `{inventorySize}`.
+Функции, возвращающие значение (`randomN`, `scaleN`, `scaleRNDN`, `healN`, `goldN`, `expN`, `spN`, `inventorySize`, `hasWeapon`, `hasArmor`, `getVar("имя")`), можно использовать в выражениях и условиях: `gold+=scale5*2`, `getVar("questStep")>=2 ? gold+=10 : gold+=1`. Значение переменной можно менять, например, так: `setVar("questStep", getVar("questStep")+1)`. `hasWeapon` и `hasArmor` возвращают `1` или `0`. В текстах можно вывести размер инвентаря через подстановку `{inventorySize}`. Пользовательские переменные хранят целые числа в течение текущей игры и очищаются при установке нового игрока.
 
 Функции-команды (`damageN`, `item`, `log("текст")`, `nextFight` и т. д.) выполняются как отдельные выражения и не возвращают значение. В полях событий `on_success`, `on_fail`, `on_victory` и в `result` действия навигационные команды `nextFight`, `nextNPC`, `nextSearch`, `nextRandom` и `nextLocation("id")` задают следующую локацию. `nextRandom` выбирает случайную локацию любого типа, а `nextLocation` переходит к локации с указанным `id`. Если указанный `id` отсутствует, переход не выполняется и сообщение об ошибке добавляется в лог. Если навигационная команда не указана, следующая локация выбирается случайно при включённом `auto_transition`. Команда `death` завершает игру.
 

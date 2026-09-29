@@ -730,6 +730,7 @@ public class GameEngine {
 
     public void setPlayer(Player player) {
         this.player = player;
+        parser.clearVariables();
     }
 
     public LocTemp getCurLoc() {
