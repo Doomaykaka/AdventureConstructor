@@ -177,7 +177,7 @@ UML схема приложения:
 
 Встроенный синтаксис внешних источников поддерживает:
 
-* **Условия** — тернарный оператор: `hp>20 ? damage3 : tryEscape`
+* **Условия** — сравнения, логические операторы `and`, `or`, `not` и тернарный оператор: `hp>20 and not hasArmor==1 ? damage3 : tryEscape`
 * **Арифметические операции** — сложение `+`, вычитание `-`, умножение `*`, деление `/`, возведение в степень `^`
 * **Изменения значений** — арифметическое присваивание: `hp+=10`, `gold-=20`, `exp+=scale20`, `str*=2`, `hp/=2`, `str^=2`
 * **Функции** — `randomN`, `damageN`, `healN`, `scaleN`, `scaleRNDN`, `item`, `itemWeapon`, `itemArmor`, `itemConsumable`, `log`, `showMessage`, `setVar`, `inputVar`, `inputNumberVar`, `confirmVar`, `getVar`, `appendVar`, `varEquals`, `varContains`, `stringLength`, `upper`, `lower`, `replace`, `concat`, `trim`, `hasVar`, `removeVar`, `clearInventory`, `removeWeapon`, `removeArmor`, `hasWeapon`, `hasArmor`, `nextFight`, `nextNPC`, `nextSearch`, `nextRandom`, `nextLocation`, `tryEscape`, `death`, `spN`, `goldN`, `expN`
@@ -808,8 +808,20 @@ UML схема приложения:
 | `<=` | Меньше или равно | `hp<=10` |
 | `==` | Равно | `level==5` |
 | `!=` | Не равно | `isAlive!=0` |
+| `and` | Логическое И; обе части должны быть истинны | `hp>0 and level>=2` |
+| `or` | Логическое ИЛИ; достаточно истинности одной части | `hasWeapon==1 or hasArmor==1` |
+| `not` | Инвертирует следующее условие | `not hasArmor==1` |
 
-Обе стороны условия вычисляются через `evalVal` — могут быть числами, ссылками на характеристики, функциями и арифметическими выражениями.
+Обе стороны сравнения вычисляются через `evalVal` — могут быть числами, ссылками на характеристики, функциями и арифметическими выражениями. Приоритет операторов: сначала `not`, затем `and`, затем `or`; скобки позволяют явно группировать условия. Выражение без сравнения считается истинным, если его числовое значение не равно нулю.
+
+**Примеры составных условий:**
+
+```
+hp>0 and level>=2 ? log("Герой готов") : log("Условие не выполнено")
+hasWeapon==1 or hasArmor==1 ? log("Экипировка есть") : log("Нужна экипировка")
+not (hp<=0 or hasArmor==1) ? log("Жив и без брони") : log("Другое состояние")
+hp>0 and (hasWeapon==1 or hasArmor==1)
+```
 
 #### Тернарный оператор
 

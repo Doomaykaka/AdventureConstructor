@@ -119,24 +119,140 @@ public class SyntaxParser {
     }
 
     public boolean evalCondition(String c) {
-        for (String op : new String[] {">=", "<=", "==", "!=", "<", ">"}) {
-            int i = c.indexOf(op);
+        String condition = c.trim();
+        if (condition.isEmpty()) return false;
 
-            if (i > 0) {
-                String l = c.substring(0, i).trim();
-                String r = c.substring(i + op.length()).trim();
-                int lv = evalValue(l), rv = evalValue(r);
+        condition = stripConditionParentheses(condition);
 
-                if (">=".equals(op)) return lv >= rv;
-                if ("<=".equals(op)) return lv <= rv;
-                if ("==".equals(op)) return lv == rv;
-                if ("!=".equals(op)) return lv != rv;
-                if (">".equals(op)) return lv > rv;
-                if ("<".equals(op)) return lv < rv;
-            }
+        List<String> parts = splitTopLevelKeyword(condition, "or");
+        if (parts.size() > 1) {
+            for (String part : parts) if (evalCondition(part)) return true;
+            return false;
         }
 
-        return false;
+        parts = splitTopLevelKeyword(condition, "and");
+        if (parts.size() > 1) {
+            for (String part : parts) if (!evalCondition(part)) return false;
+            return true;
+        }
+
+        if (startsWithKeyword(condition, "not"))
+            return !evalCondition(condition.substring(3).trim());
+
+        int comparison = findTopLevelComparison(condition);
+        if (comparison >= 0) {
+            String op = comparisonOperatorAt(condition, comparison);
+            String l = condition.substring(0, comparison).trim();
+            String r = condition.substring(comparison + op.length()).trim();
+            int lv = evalValue(l), rv = evalValue(r);
+
+            if (">=".equals(op)) return lv >= rv;
+            if ("<=".equals(op)) return lv <= rv;
+            if ("==".equals(op)) return lv == rv;
+            if ("!=".equals(op)) return lv != rv;
+            if (">".equals(op)) return lv > rv;
+            if ("<".equals(op)) return lv < rv;
+        }
+
+        return evalValue(condition) != 0;
+    }
+
+    private String stripConditionParentheses(String condition) {
+        String value = condition.trim();
+        while (value.startsWith("(") && value.endsWith(")")) {
+            int depth = 0;
+            char quote = 0;
+            boolean wrapsWholeCondition = true;
+            for (int i = 0; i < value.length(); i++) {
+                char current = value.charAt(i);
+                if (quote != 0) {
+                    if (current == quote && (i == 0 || value.charAt(i - 1) != '\\')) quote = 0;
+                    continue;
+                }
+                if (current == '"' || current == '\'') quote = current;
+                else if (current == '(') depth++;
+                else if (current == ')' && --depth == 0 && i < value.length() - 1) {
+                    wrapsWholeCondition = false;
+                    break;
+                }
+            }
+            if (!wrapsWholeCondition || depth != 0) break;
+            value = value.substring(1, value.length() - 1).trim();
+        }
+        return value;
+    }
+
+    private List<String> splitTopLevelKeyword(String expression, String keyword) {
+        List<String> parts = new ArrayList<>();
+        int depth = 0;
+        int start = 0;
+        char quote = 0;
+        for (int i = 0; i <= expression.length() - keyword.length(); i++) {
+            char current = expression.charAt(i);
+            if (quote != 0) {
+                if (current == quote && (i == 0 || expression.charAt(i - 1) != '\\')) quote = 0;
+                continue;
+            }
+            if (current == '"' || current == '\'') {
+                quote = current;
+                continue;
+            }
+            if (current == '(') {
+                depth++;
+                continue;
+            }
+            if (current == ')') {
+                depth--;
+                continue;
+            }
+            if (depth == 0
+                    && expression.regionMatches(true, i, keyword, 0, keyword.length())
+                    && (i == 0 || !isConditionWordCharacter(expression.charAt(i - 1)))
+                    && (i + keyword.length() == expression.length()
+                            || !isConditionWordCharacter(expression.charAt(i + keyword.length())))) {
+                parts.add(expression.substring(start, i).trim());
+                i += keyword.length() - 1;
+                start = i + 1;
+            }
+        }
+        if (start == 0) return parts;
+        parts.add(expression.substring(start).trim());
+        return parts;
+    }
+
+    private boolean startsWithKeyword(String expression, String keyword) {
+        return expression.regionMatches(true, 0, keyword, 0, keyword.length())
+                && expression.length() > keyword.length()
+                && !isConditionWordCharacter(expression.charAt(keyword.length()));
+    }
+
+    private boolean isConditionWordCharacter(char value) {
+        return Character.isLetterOrDigit(value) || value == '_';
+    }
+
+    private int findTopLevelComparison(String expression) {
+        int depth = 0;
+        char quote = 0;
+        for (int i = 0; i < expression.length(); i++) {
+            char current = expression.charAt(i);
+            if (quote != 0) {
+                if (current == quote && (i == 0 || expression.charAt(i - 1) != '\\')) quote = 0;
+                continue;
+            }
+            if (current == '"' || current == '\'') quote = current;
+            else if (current == '(') depth++;
+            else if (current == ')') depth--;
+            else if (depth == 0 && (current == '<' || current == '>' || current == '=' || current == '!')) {
+                if (comparisonOperatorAt(expression, i) != null) return i;
+            }
+        }
+        return -1;
+    }
+
+    private String comparisonOperatorAt(String expression, int index) {
+        for (String op : new String[] {">=", "<=", "==", "!=", "<", ">"})
+            if (expression.startsWith(op, index)) return op;
+        return null;
     }
 
     private int getStat(String s) {
