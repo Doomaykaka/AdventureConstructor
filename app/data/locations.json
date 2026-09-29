@@ -11,7 +11,7 @@
       "enemy_damage": 1,
       "enemy_defense": 0,
       "scale_enemy": false,
-      "on_victory": "",
+      "on_victory": "nextLocation(\"test_npc\")",
       "on_defeat": ""
     },
     {
@@ -21,7 +21,9 @@
       "description": "Мирная локация после боя.",
       "auto_transition": false,
       "npc_name": "Тестовый NPC",
-      "dialog_id": "test_dialog"
+      "dialog_id": "test_dialog",
+      "on_success": "nextLocation(\"test_search\")",
+      "on_fail": "nextLocation(\"test_battle\")"
     },
     {
       "id": "test_search",
@@ -35,12 +37,24 @@
           "result": "log(\"Сообщение добавлено кнопкой из исследовательской локации. Текущее HP: {hp}\")"
         },
         {
+          "text": "Перейти в мирную локацию по ID",
+          "result": "nextLocation(\"test_npc\")"
+        },
+        {
+          "text": "Перейти в боевую локацию по ID",
+          "result": "nextLocation(\"test_battle\")"
+        },
+        {
+          "text": "Перейти в эту локацию по ID",
+          "result": "nextLocation(\"test_search\")"
+        },
+        {
           "text": "Осмотреть дорожный сундук",
           "result": "gold+=5"
         },
         {
           "text": "Вернуться к торговцу",
-          "result": "nextNPC"
+          "result": "nextLocation(\"test_npc\")"
         },
         {
           "text": "Пойти по следам в чащу",

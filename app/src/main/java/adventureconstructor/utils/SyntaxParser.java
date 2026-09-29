@@ -18,6 +18,7 @@ public class SyntaxParser {
         "itemConsumable",
         "itemWeapon",
         "itemArmor",
+        "nextLocation",
         "nextSearch",
         "tryEscape",
         "nextFight",
@@ -319,6 +320,18 @@ public class SyntaxParser {
                         return;
                     case "nextSearch":
                         nav = "nextSearch";
+                        return;
+                    case "nextLocation":
+                        String locationId = np.trim();
+                        if (locationId.startsWith("(") && locationId.endsWith(")"))
+                            locationId = locationId
+                                    .substring(1, locationId.length() - 1)
+                                    .trim();
+                        if (locationId.length() >= 2
+                                && ((locationId.startsWith("\"") && locationId.endsWith("\""))
+                                        || (locationId.startsWith("'") && locationId.endsWith("'"))))
+                            locationId = locationId.substring(1, locationId.length() - 1);
+                        if (!locationId.isEmpty()) nav = "nextLocation:" + locationId;
                         return;
                     case "tryEscape":
                         nav = "tryEscape";

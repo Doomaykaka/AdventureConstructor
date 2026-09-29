@@ -43,6 +43,7 @@ public class GameEngine {
     private List<String> combatLog = new ArrayList<>();
     private String transitionMsg = "";
     private String transitionNavigation;
+    private boolean transitionNavigationFailed;
 
     private String lastAmbientKey = null;
 
@@ -301,6 +302,23 @@ public class GameEngine {
 
         LocTemp cloned = LocTempCloner.clone(pool.get(rng.nextInt(pool.size())));
 
+        prepareLocationAssets(cloned);
+        setCurLoc(cloned);
+    }
+
+    private boolean genLocationById(String id) {
+        for (LocTemp location : locPool) {
+            if (id.equals(location.getId())) {
+                LocTemp cloned = LocTempCloner.clone(location);
+                prepareLocationAssets(cloned);
+                setCurLoc(cloned);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void prepareLocationAssets(LocTemp cloned) {
         if (cloned.getImage() == null || cloned.getImage().isEmpty()) {
             List<String> imgs = imagePool.get(cloned.getType());
             if (imgs != null && !imgs.isEmpty()) {
@@ -314,8 +332,6 @@ public class GameEngine {
                 cloned.setAmbient(ambs.get(rng.nextInt(ambs.size())));
             }
         }
-
-        setCurLoc(cloned);
     }
 
     public String getCurImagePath() {
@@ -396,6 +412,7 @@ public class GameEngine {
         }
 
         getCombatLog().clear();
+        transitionNavigationFailed = false;
 
         if ("peaceful".equals(getCurLoc().getType())) {
             DialogData d = dialogs.get(getCurLoc().getDialogId());
@@ -488,6 +505,7 @@ public class GameEngine {
     }
 
     void endDialog(boolean success) {
+        transitionNavigationFailed = false;
         if (success && getCurLoc().getOnSuccess() != null)
             transitionNavigation = parser.execute(getCurLoc().getOnSuccess(), getPlayer(), this);
         else if (!success && getCurLoc().getOnFail() != null)
@@ -612,6 +630,15 @@ public class GameEngine {
         if (nav == null) nav = a.getNext();
         getPlayer().heal(getPlayer().getMaxHp() / 4);
         incScore();
+        if (nav != null && nav.startsWith("nextLocation:")) {
+            String id = nav.substring("nextLocation:".length());
+            if (genLocationById(id)) enterLoc();
+            else {
+                getCombatLog().add("Location id not found: " + id);
+                syncPlayerToDb();
+            }
+            return;
+        }
         if ((nav == null || nav.trim().isEmpty()) && !getCurLoc().isAutoTransition()) {
             syncPlayerToDb();
             return;
@@ -624,6 +651,7 @@ public class GameEngine {
     }
 
     public void continueAfterTransition() {
+        if (transitionNavigationFailed) return;
         String nav = transitionNavigation;
         if ((nav == null || nav.trim().isEmpty()) && !getCurLoc().isAutoTransition()) return;
         transitionNavigation = null;
@@ -633,14 +661,25 @@ public class GameEngine {
             syncPlayerToDb();
             return;
         }
+        if (nav != null && nav.startsWith("nextLocation:")) {
+            String id = nav.substring("nextLocation:".length());
+            if (genLocationById(id)) enterLoc();
+            else {
+                getCombatLog().add("Location id not found: " + id);
+                transitionNavigationFailed = true;
+                syncPlayerToDb();
+            }
+            return;
+        }
         genLocation(locationTypeForNavigation(nav));
         enterLoc();
     }
 
     public boolean canContinueAfterTransition() {
-        return transitionNavigation != null && !transitionNavigation.trim().isEmpty()
-                || getCurLoc() == null
-                || getCurLoc().isAutoTransition();
+        return !transitionNavigationFailed
+                && (transitionNavigation != null && !transitionNavigation.trim().isEmpty()
+                        || getCurLoc() == null
+                        || getCurLoc().isAutoTransition());
     }
 
     private String locationTypeForNavigation(String nav) {

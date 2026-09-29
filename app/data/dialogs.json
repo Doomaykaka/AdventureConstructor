@@ -5,18 +5,42 @@
     "nodes": [
       {
         "id": "start",
-        "text": "Успех: после боевой локации открылась мирная локация через nextNPC.",
+        "text": "Тестовая мирная локация. Выберите конкретную локацию для перехода:",
         "options": [
           {
-            "text": "Проверить вывод текста в лог",
+            "text": "Перейти в исследовательскую локацию по ID",
+            "type": "choice",
+            "next": "to_search"
+          },
+          {
+            "text": "Перейти в боевую локацию по ID",
+            "type": "choice",
+            "next": "to_battle"
+          },
+          {
+            "text": "Проверить вывод текста в лог и перейти в лагерь",
             "type": "choice",
             "next": "log_test"
           }
         ]
       },
       {
+        "id": "to_search",
+        "text": "Переход выполнен через on_success с nextLocation.",
+        "end_dialog": true,
+        "success": true,
+        "options": []
+      },
+      {
+        "id": "to_battle",
+        "text": "Переход выполнен через on_fail с nextLocation.",
+        "end_dialog": true,
+        "success": false,
+        "options": []
+      },
+      {
         "id": "log_test",
-        "text": "Нажмите «Продолжить», чтобы увидеть сообщение в логе перехода.",
+        "text": "Сообщение появится в логе перехода.",
         "reward": "log(\"Сообщение добавлено кнопкой диалога с NPC. Текущее HP: {hp}\")",
         "end_dialog": true,
         "success": true,

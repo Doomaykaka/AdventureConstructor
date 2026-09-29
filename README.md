@@ -180,7 +180,7 @@ UML схема приложения:
 * **Условия** — тернарный оператор: `hp>20 ? damage3 : tryEscape`
 * **Арифметические операции** — сложение `+`, вычитание `-`, умножение `*`, деление `/`, возведение в степень `^`
 * **Изменения значений** — арифметическое присваивание: `hp+=10`, `gold-=20`, `exp+=scale20`, `str*=2`, `hp/=2`, `str^=2`
-* **Функции** — `randomN`, `damageN`, `healN`, `scaleN`, `scaleRNDN`, `item`, `itemWeapon`, `itemArmor`, `itemConsumable`, `log`, `clearInventory`, `removeWeapon`, `removeArmor`, `nextFight`, `nextNPC`, `nextSearch`, `tryEscape`, `death`, `spN`, `goldN`, `expN`
+* **Функции** — `randomN`, `damageN`, `healN`, `scaleN`, `scaleRNDN`, `item`, `itemWeapon`, `itemArmor`, `itemConsumable`, `log`, `clearInventory`, `removeWeapon`, `removeArmor`, `nextFight`, `nextNPC`, `nextSearch`, `nextLocation`, `tryEscape`, `death`, `spN`, `goldN`, `expN`
 * **Подстановки в тексте** — `{gold}`, `{hp}`, `{maxHp}`, `{level}`, `{item}`, `{char.str}`, `{char.agi}`, `{char.intl}`, `{char.end}`
 
 Подробное описание каждого источника данных и синтаксиса приведено в подразделах ниже.
@@ -762,6 +762,7 @@ UML схема приложения:
 | `nextFight` | навигация | Переход к враждебной локации | `nextFight` |
 | `nextNPC` | навигация | Переход к мирной локации | `nextNPC` |
 | `nextSearch` | навигация | Переход к исследовательской локации | `nextSearch` |
+| `nextLocation("id")` | навигация | Переход к локации с указанным `id` независимо от её типа | `nextLocation("village_01")` |
 | `tryEscape` | навигация | Попытка побега | `tryEscape` |
 | `death` | навигация | Смерть игрока | `death` |
 | `goldN` | значение | Возвращает N (для использования в выражениях) | `gold+=gold50` |
@@ -770,7 +771,7 @@ UML схема приложения:
 
 Функции, возвращающие значение (`randomN`, `scaleN`, `scaleRNDN`, `healN`, `goldN`, `expN`, `spN`), могут использоваться внутри арифметических выражений: `gold+=scale5*2`, `hp-=random10+5`.
 
-Функции-команды (`damageN`, `item`, `log("текст")`, `nextFight` и т. д.) выполняются как отдельные выражения и не возвращают значение. В полях событий `on_success`, `on_fail` и `on_victory` навигационные команды `nextFight`, `nextNPC` и `nextSearch` задают тип следующей локации после экрана перехода. Если навигационная команда не указана, следующая локация выбирается случайно. Команда `death` завершает игру.
+Функции-команды (`damageN`, `item`, `log("текст")`, `nextFight` и т. д.) выполняются как отдельные выражения и не возвращают значение. В полях событий `on_success`, `on_fail`, `on_victory` и в `result` действия навигационные команды `nextFight`, `nextNPC`, `nextSearch` и `nextLocation("id")` задают следующую локацию. `nextLocation` работает с локациями любого типа. Если указанный `id` отсутствует, переход не выполняется и сообщение об ошибке добавляется в лог. Если навигационная команда не указана, следующая локация выбирается случайно при включённом `auto_transition`. Команда `death` завершает игру.
 
 #### Условия
 
