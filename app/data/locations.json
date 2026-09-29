@@ -20,6 +20,29 @@
       "description": "Мирная локация после боя.",
       "npc_name": "Тестовый NPC",
       "dialog_id": "test_dialog"
+    },
+    {
+      "id": "test_search",
+      "type": "exploratory",
+      "name": "Заброшенный лагерь",
+      "description": "Среди развалин лагеря видны следы недавней стоянки и закрытый дорожный сундук.",
+      "actions": [
+        {
+          "text": "Осмотреть дорожный сундук",
+          "result": "gold+=5",
+          "next": "nextSearch"
+        },
+        {
+          "text": "Вернуться к торговцу",
+          "result": "",
+          "next": "nextNPC"
+        },
+        {
+          "text": "Пойти по следам в чащу",
+          "result": "",
+          "next": "nextFight"
+        }
+      ]
     }
   ]
 }

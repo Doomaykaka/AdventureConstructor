@@ -195,7 +195,11 @@ public class GameUI extends JFrame {
     }
 
     void showExplore() {
-        scenePanel.setScene(eng.getCurLoc().getName(), eng.getCurLoc().getType(), eng.getCurImagePath());
+        scenePanel.setScene(
+                eng.getCurLoc().getName(),
+                eng.getCurLoc().getType(),
+                eng.getCurImagePath(),
+                eng.formatText(eng.getCurLoc().getDesc()));
         textArea.setText(eng.formatText(eng.getCurLoc().getDesc()));
         for (LocAct a : eng.getCurLoc().getActions()) {
             addButton(eng.formatText(a.getText()), e -> {
@@ -206,7 +210,11 @@ public class GameUI extends JFrame {
     }
 
     void showCombat() {
-        scenePanel.setScene("Combat: " + eng.getCurEnemy().getName(), "hostile", eng.getCurImagePath());
+        scenePanel.setScene(
+                eng.getCurLoc().getName(),
+                "hostile",
+                eng.getCurImagePath(),
+                eng.formatText(eng.getCurLoc().getDesc()));
         StringBuilder sb = new StringBuilder();
         sb.append("Enemy: ")
                 .append(eng.getCurEnemy().getName())
@@ -240,7 +248,11 @@ public class GameUI extends JFrame {
     }
 
     void showDialog() {
-        scenePanel.setScene("Talk: " + eng.getCurDialog().getNpcName(), "peaceful", eng.getCurImagePath());
+        scenePanel.setScene(
+                eng.getCurLoc().getName(),
+                "peaceful",
+                eng.getCurImagePath(),
+                eng.formatText(eng.getCurLoc().getDesc()));
         StringBuilder sb = new StringBuilder();
         sb.append(eng.getCurDialog().getNpcName()).append(":\n");
         if (eng.getCurNode() != null) {
