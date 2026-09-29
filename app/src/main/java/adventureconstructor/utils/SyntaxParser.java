@@ -26,6 +26,7 @@ public class SyntaxParser {
         "scaleRND",
         "nextNPC",
         "random",
+        "inventorySize",
         "damage",
         "defend",
         "scale",
@@ -200,6 +201,7 @@ public class SyntaxParser {
                 n = Integer.parseInt(np);
             } catch (Exception x) {
             }
+        if ("inventorySize".equals(fn)) return getPlayer().getInv().size();
         if ("random".equals(fn) || "damage".equals(fn)) return rng.nextInt(n) + 1;
         if ("heal".equals(fn) || "gold".equals(fn) || "exp".equals(fn) || "sp".equals(fn)) return n;
         if ("scale".equals(fn)) return n * getPlayer().getLevel();

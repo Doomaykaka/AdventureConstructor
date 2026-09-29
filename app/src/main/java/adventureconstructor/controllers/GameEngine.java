@@ -453,6 +453,7 @@ public class GameEngine {
         r = r.replace("{hp}", String.valueOf(getPlayer().getHp()));
         r = r.replace("{maxHp}", String.valueOf(getPlayer().getMaxHp()));
         r = r.replace("{level}", String.valueOf(getPlayer().getLevel()));
+        r = r.replace("{inventorySize}", String.valueOf(getPlayer().getInv().size()));
         r = r.replace("{item}", pickName("weapon_names"));
         r = r.replace("{char.str}", String.valueOf(getPlayer().getStr()));
         r = r.replace("{char.agi}", String.valueOf(getPlayer().getAgi()));
