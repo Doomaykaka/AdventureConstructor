@@ -37,6 +37,7 @@ public class SyntaxParser {
         "inputVar",
         "inputNumberVar",
         "confirmVar",
+        "showMessage",
         "appendVar",
         "getVar",
         "varEquals",
@@ -388,6 +389,11 @@ public class SyntaxParser {
                                 JOptionPane.QUESTION_MESSAGE);
                         if (answer == JOptionPane.YES_OPTION) variables.put(name, 1);
                         else if (answer == JOptionPane.NO_OPTION) variables.put(name, 0);
+                        return;
+                    }
+                    case "showMessage": {
+                        String message = String.valueOf(evaluateStringValue(functionArguments(np)));
+                        JOptionPane.showMessageDialog(null, message, "Информация", JOptionPane.INFORMATION_MESSAGE);
                         return;
                     }
                     case "appendVar": {
