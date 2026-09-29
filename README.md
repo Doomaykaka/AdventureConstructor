@@ -180,7 +180,7 @@ UML схема приложения:
 * **Условия** — тернарный оператор: `hp>20 ? damage3 : tryEscape`
 * **Арифметические операции** — сложение `+`, вычитание `-`, умножение `*`, деление `/`, возведение в степень `^`
 * **Изменения значений** — арифметическое присваивание: `hp+=10`, `gold-=20`, `exp+=scale20`, `str*=2`, `hp/=2`, `str^=2`
-* **Функции** — `randomN`, `damageN`, `healN`, `scaleN`, `scaleRNDN`, `item`, `itemWeapon`, `itemArmor`, `itemConsumable`, `log`, `setVar`, `inputVar`, `inputNumberVar`, `getVar`, `appendVar`, `varEquals`, `varContains`, `stringLength`, `upper`, `lower`, `replace`, `concat`, `trim`, `hasVar`, `removeVar`, `clearInventory`, `removeWeapon`, `removeArmor`, `hasWeapon`, `hasArmor`, `nextFight`, `nextNPC`, `nextSearch`, `nextRandom`, `nextLocation`, `tryEscape`, `death`, `spN`, `goldN`, `expN`
+* **Функции** — `randomN`, `damageN`, `healN`, `scaleN`, `scaleRNDN`, `item`, `itemWeapon`, `itemArmor`, `itemConsumable`, `log`, `setVar`, `inputVar`, `inputNumberVar`, `confirmVar`, `getVar`, `appendVar`, `varEquals`, `varContains`, `stringLength`, `upper`, `lower`, `replace`, `concat`, `trim`, `hasVar`, `removeVar`, `clearInventory`, `removeWeapon`, `removeArmor`, `hasWeapon`, `hasArmor`, `nextFight`, `nextNPC`, `nextSearch`, `nextRandom`, `nextLocation`, `tryEscape`, `death`, `spN`, `goldN`, `expN`
 * **Подстановки в тексте** — `{gold}`, `{hp}`, `{maxHp}`, `{level}`, `{inventorySize}`, `{var:name}`, `{item}`, `{char.str}`, `{char.agi}`, `{char.intl}`, `{char.end}`
 
 Подробное описание каждого источника данных и синтаксиса приведено в подразделах ниже.
@@ -759,6 +759,7 @@ UML схема приложения:
 | `setVar("имя", значение)` | команда | Сохраняет числовую или строковую пользовательскую переменную | `setVar("questStep", 2)` или `setVar("greeting", "Привет!")` |
 | `inputVar("имя")` | команда | Запрашивает текст и сохраняет его в переменную; при отмене оставляет старое значение | `inputVar("greeting")` |
 | `inputNumberVar("имя")` | команда | Запрашивает целое число; при отмене или некорректном вводе оставляет старое значение | `inputNumberVar("questStep")` |
+| `confirmVar("имя")` | команда | Показывает диалог «Да/Нет» и записывает `1` при выборе «Да», `0` при «Нет»; при закрытии оставляет старое значение | `confirmVar("accepted")` |
 | `getVar("имя")` | значение | Возвращает пользовательскую переменную (для неустановленной возвращает `0`) | `getVar("questStep")` или `log(getVar("greeting"))` |
 | `{var:имя}` | подстановка | Вставляет строковое значение переменной в текст | `log("Привет, {var:name}")` |
 | `varEquals("имя", "текст")` | значение | Возвращает `1`, если строка переменной точно совпадает с текстом | `varEquals("name", "Алиса")==1 ? log("Привет!") : log("Кто вы?")` |

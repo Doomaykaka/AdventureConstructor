@@ -36,6 +36,7 @@ public class SyntaxParser {
         "setVar",
         "inputVar",
         "inputNumberVar",
+        "confirmVar",
         "appendVar",
         "getVar",
         "varEquals",
@@ -374,6 +375,19 @@ public class SyntaxParser {
                                     "Некорректное значение",
                                     JOptionPane.WARNING_MESSAGE);
                         }
+                        return;
+                    }
+                    case "confirmVar": {
+                        String name = unquote(functionArguments(np).trim());
+                        if (name.isEmpty()) return;
+                        int answer = JOptionPane.showConfirmDialog(
+                                null,
+                                "Вы подтверждаете действие?",
+                                "Подтверждение",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE);
+                        if (answer == JOptionPane.YES_OPTION) variables.put(name, 1);
+                        else if (answer == JOptionPane.NO_OPTION) variables.put(name, 0);
                         return;
                     }
                     case "appendVar": {

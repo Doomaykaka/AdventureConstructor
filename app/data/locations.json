@@ -141,6 +141,18 @@
           "result": "log(concat(\"Число: \", getVar(\"numberInputTest\")))"
         },
         {
+          "text": "Подготовить исходное значение подтверждения",
+          "result": "setVar(\"confirmTest\", 42)"
+        },
+        {
+          "text": "Подтвердить действие (Да/Нет)",
+          "result": "confirmVar(\"confirmTest\")"
+        },
+        {
+          "text": "Показать результат подтверждения",
+          "result": "log(concat(\"Ответ (0/1): \", getVar(\"confirmTest\")))"
+        },
+        {
           "text": "Перейти в мирную локацию по ID",
           "result": "nextLocation(\"test_npc\")"
         },
