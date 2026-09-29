@@ -459,6 +459,7 @@ public class GameEngine {
         r = r.replace("{char.agi}", String.valueOf(getPlayer().getAgi()));
         r = r.replace("{char.intl}", String.valueOf(getPlayer().getIntl()));
         r = r.replace("{char.end}", String.valueOf(getPlayer().getEnd()));
+        r = parser.formatVariables(r);
         return r;
     }
 

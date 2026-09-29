@@ -77,6 +77,22 @@
           "result": "log(getVar(\"testGreeting\"))"
         },
         {
+          "text": "Проверить подстановку строки в текст",
+          "result": "log(\"Привет, {var:testGreeting}\")"
+        },
+        {
+          "text": "Добавить фамилию в тестовую строку",
+          "result": "appendVar(\"testGreeting\", \" Иванова\")"
+        },
+        {
+          "text": "Сравнить тестовую строку",
+          "result": "varEquals(\"testGreeting\", \"Привет, герой! Иванова\")==1 ? log(\"Строки совпадают\") : log(\"Строки не совпадают\")"
+        },
+        {
+          "text": "Найти фамилию в тестовой строке",
+          "result": "varContains(\"testGreeting\", \"Иванова\")==1 ? log(\"Подстрока найдена\") : log(\"Подстрока не найдена\")"
+        },
+        {
           "text": "Перейти в мирную локацию по ID",
           "result": "nextLocation(\"test_npc\")"
         },

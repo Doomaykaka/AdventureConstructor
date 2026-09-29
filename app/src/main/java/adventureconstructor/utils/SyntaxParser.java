@@ -30,7 +30,10 @@ public class SyntaxParser {
         "nextNPC",
         "random",
         "setVar",
+        "appendVar",
         "getVar",
+        "varEquals",
+        "varContains",
         "inventorySize",
         "hasWeapon",
         "hasArmor",
@@ -218,6 +221,18 @@ public class SyntaxParser {
                 return 0;
             }
         }
+        if ("varEquals".equals(fn) || "varContains".equals(fn)) {
+            String args = functionArguments(np);
+            int separator = findTopLevelComma(args);
+            if (separator < 0) return 0;
+            String name = unquote(args.substring(0, separator).trim());
+            String expected = resolveStringArgument(args.substring(separator + 1));
+            Object stored = variables.get(name);
+            if (stored == null) return 0;
+            String actual = String.valueOf(stored);
+            boolean matches = "varEquals".equals(fn) ? actual.equals(expected) : actual.contains(expected);
+            return matches ? 1 : 0;
+        }
         if ("inventorySize".equals(fn)) return getPlayer().getInv().size();
         if ("hasWeapon".equals(fn)) return getPlayer().getWeapon() != null ? 1 : 0;
         if ("hasArmor".equals(fn)) return getPlayer().getArmor() != null ? 1 : 0;
@@ -315,6 +330,17 @@ public class SyntaxParser {
                     } catch (Exception x) {
                     }
                 switch (fn) {
+                    case "appendVar": {
+                        String args = functionArguments(np);
+                        int separator = findTopLevelComma(args);
+                        if (separator < 0) return;
+                        String name = unquote(args.substring(0, separator).trim());
+                        if (name.isEmpty()) return;
+                        String current = String.valueOf(variables.getOrDefault(name, ""));
+                        String addition = resolveStringArgument(args.substring(separator + 1));
+                        variables.put(name, current + addition);
+                        return;
+                    }
                     case "setVar": {
                         String args = functionArguments(np);
                         int separator = findTopLevelComma(args);
@@ -455,6 +481,22 @@ public class SyntaxParser {
         String arguments = functionArguments(text.substring("getVar".length()));
         if (findTopLevelComma(arguments) >= 0) return null;
         return unquote(arguments);
+    }
+
+    private String resolveStringArgument(String argument) {
+        String value = argument.trim();
+        if (isQuoted(value)) return unquote(value);
+        String name = getVarName(value);
+        if (name != null) return String.valueOf(variables.getOrDefault(name, ""));
+        return value;
+    }
+
+    public String formatVariables(String text) {
+        String formatted = text;
+        for (Map.Entry<String, Object> variable : variables.entrySet()) {
+            formatted = formatted.replace("{var:" + variable.getKey() + "}", String.valueOf(variable.getValue()));
+        }
+        return formatted;
     }
 
     private int findTopLevelComma(String value) {
