@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import javax.swing.JOptionPane;
 
 public class SyntaxParser {
     private Random rng = new Random();
@@ -33,6 +34,7 @@ public class SyntaxParser {
         "nextNPC",
         "random",
         "setVar",
+        "inputVar",
         "appendVar",
         "getVar",
         "varEquals",
@@ -348,6 +350,14 @@ public class SyntaxParser {
                     } catch (Exception x) {
                     }
                 switch (fn) {
+                    case "inputVar": {
+                        String name = unquote(functionArguments(np).trim());
+                        if (name.isEmpty()) return;
+                        String input =
+                                JOptionPane.showInputDialog(null, "Введите текст для переменной «" + name + "»:");
+                        if (input != null) variables.put(name, input);
+                        return;
+                    }
                     case "appendVar": {
                         String args = functionArguments(np);
                         int separator = findTopLevelComma(args);

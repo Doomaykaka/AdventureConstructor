@@ -117,6 +117,18 @@
           "result": "removeVar(\"testGreeting\")"
         },
         {
+          "text": "Подготовить исходное значение для окна ввода",
+          "result": "setVar(\"inputTest\", \"Исходное значение\")"
+        },
+        {
+          "text": "Ввести текст в пользовательскую переменную",
+          "result": "inputVar(\"inputTest\")"
+        },
+        {
+          "text": "Показать значение после ввода или отмены",
+          "result": "log(\"Значение: {var:inputTest}\")"
+        },
+        {
           "text": "Перейти в мирную локацию по ID",
           "result": "nextLocation(\"test_npc\")"
         },
