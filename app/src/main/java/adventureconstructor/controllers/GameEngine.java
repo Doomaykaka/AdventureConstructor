@@ -646,6 +646,7 @@ public class GameEngine {
         if ("nextFight".equals(nav)) genLocation("hostile");
         else if ("nextNPC".equals(nav)) genLocation("peaceful");
         else if ("nextSearch".equals(nav)) genLocation("exploratory");
+        else if ("nextRandom".equals(nav)) genLocation(null);
         else genLocation(null);
         enterLoc();
     }
@@ -671,7 +672,7 @@ public class GameEngine {
             }
             return;
         }
-        genLocation(locationTypeForNavigation(nav));
+        genLocation("nextRandom".equals(nav) ? null : locationTypeForNavigation(nav));
         enterLoc();
     }
 

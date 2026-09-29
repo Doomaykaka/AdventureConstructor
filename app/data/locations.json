@@ -4,14 +4,14 @@
       "id": "test_battle",
       "type": "hostile",
       "name": "Тестовый бой",
-      "description": "Проверка перехода nextNPC после победы.",
+      "description": "Проверка перехода nextRandom после победы.",
       "auto_transition": false,
       "enemy_name": "Слабый тестовый противник",
       "enemy_hp": 4,
       "enemy_damage": 1,
       "enemy_defense": 0,
       "scale_enemy": false,
-      "on_victory": "nextLocation(\"test_npc\")",
+      "on_victory": "nextRandom",
       "on_defeat": ""
     },
     {
@@ -22,7 +22,7 @@
       "auto_transition": false,
       "npc_name": "Тестовый NPC",
       "dialog_id": "test_dialog",
-      "on_success": "nextLocation(\"test_search\")",
+      "on_success": "nextRandom",
       "on_fail": "nextLocation(\"test_battle\")"
     },
     {
@@ -47,6 +47,10 @@
         {
           "text": "Перейти в эту локацию по ID",
           "result": "nextLocation(\"test_search\")"
+        },
+        {
+          "text": "Перейти в случайную локацию любого типа",
+          "result": "nextRandom"
         },
         {
           "text": "Осмотреть дорожный сундук",

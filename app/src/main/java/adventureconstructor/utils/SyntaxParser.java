@@ -19,6 +19,7 @@ public class SyntaxParser {
         "itemWeapon",
         "itemArmor",
         "nextLocation",
+        "nextRandom",
         "nextSearch",
         "tryEscape",
         "nextFight",
@@ -320,6 +321,9 @@ public class SyntaxParser {
                         return;
                     case "nextSearch":
                         nav = "nextSearch";
+                        return;
+                    case "nextRandom":
+                        nav = "nextRandom";
                         return;
                     case "nextLocation":
                         String locationId = np.trim();

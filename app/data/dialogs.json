@@ -8,7 +8,7 @@
         "text": "Тестовая мирная локация. Выберите конкретную локацию для перехода:",
         "options": [
           {
-            "text": "Перейти в исследовательскую локацию по ID",
+            "text": "Перейти в случайную локацию любого типа",
             "type": "choice",
             "next": "to_search"
           },
@@ -18,7 +18,7 @@
             "next": "to_battle"
           },
           {
-            "text": "Проверить вывод текста в лог и перейти в лагерь",
+            "text": "Проверить вывод текста в лог и выполнить nextRandom",
             "type": "choice",
             "next": "log_test"
           }
@@ -26,7 +26,7 @@
       },
       {
         "id": "to_search",
-        "text": "Переход выполнен через on_success с nextLocation.",
+        "text": "Переход выполнен через on_success с nextRandom.",
         "end_dialog": true,
         "success": true,
         "options": []
