@@ -35,6 +35,7 @@ public class SyntaxParser {
         "random",
         "setVar",
         "inputVar",
+        "inputNumberVar",
         "appendVar",
         "getVar",
         "varEquals",
@@ -356,6 +357,23 @@ public class SyntaxParser {
                         String input =
                                 JOptionPane.showInputDialog(null, "Введите текст для переменной «" + name + "»:");
                         if (input != null) variables.put(name, input);
+                        return;
+                    }
+                    case "inputNumberVar": {
+                        String name = unquote(functionArguments(np).trim());
+                        if (name.isEmpty()) return;
+                        String input =
+                                JOptionPane.showInputDialog(null, "Введите целое число для переменной «" + name + "»:");
+                        if (input == null) return;
+                        try {
+                            variables.put(name, Integer.parseInt(input.trim()));
+                        } catch (NumberFormatException x) {
+                            JOptionPane.showMessageDialog(
+                                    null,
+                                    "Введите целое число. Значение переменной не изменено.",
+                                    "Некорректное значение",
+                                    JOptionPane.WARNING_MESSAGE);
+                        }
                         return;
                     }
                     case "appendVar": {

@@ -129,6 +129,18 @@
           "result": "log(\"Значение: {var:inputTest}\")"
         },
         {
+          "text": "Подготовить исходное числовое значение",
+          "result": "setVar(\"numberInputTest\", 42)"
+        },
+        {
+          "text": "Ввести целое число",
+          "result": "inputNumberVar(\"numberInputTest\")"
+        },
+        {
+          "text": "Показать числовое значение после ввода",
+          "result": "log(concat(\"Число: \", getVar(\"numberInputTest\")))"
+        },
+        {
           "text": "Перейти в мирную локацию по ID",
           "result": "nextLocation(\"test_npc\")"
         },
