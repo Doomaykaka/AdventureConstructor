@@ -69,6 +69,14 @@
           "result": "getVar(\"testValue\")==43 ? log(\"Переменная прочитана: 43\") : log(\"Переменная не равна 43\")"
         },
         {
+          "text": "Установить тестовую строку",
+          "result": "setVar(\"testGreeting\", \"Привет, герой!\")"
+        },
+        {
+          "text": "Вывести тестовую строку в лог",
+          "result": "log(getVar(\"testGreeting\"))"
+        },
+        {
           "text": "Перейти в мирную локацию по ID",
           "result": "nextLocation(\"test_npc\")"
         },

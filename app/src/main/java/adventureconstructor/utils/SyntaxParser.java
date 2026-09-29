@@ -11,7 +11,7 @@ public class SyntaxParser {
     private Player player;
     private GameEngine engine;
     private String nav = null;
-    private final Map<String, Integer> variables = new HashMap<>();
+    private final Map<String, Object> variables = new HashMap<>();
 
     private static String[] funcs = {
         "clearInventory",
@@ -210,7 +210,13 @@ public class SyntaxParser {
             }
         if ("getVar".equals(fn)) {
             String name = unquote(functionArguments(np).trim());
-            return variables.getOrDefault(name, 0);
+            Object value = variables.getOrDefault(name, 0);
+            if (value instanceof Number) return ((Number) value).intValue();
+            try {
+                return Integer.parseInt(String.valueOf(value));
+            } catch (NumberFormatException ex) {
+                return 0;
+            }
         }
         if ("inventorySize".equals(fn)) return getPlayer().getInv().size();
         if ("hasWeapon".equals(fn)) return getPlayer().getWeapon() != null ? 1 : 0;
@@ -315,7 +321,16 @@ public class SyntaxParser {
                         if (separator < 0) return;
                         String name = unquote(args.substring(0, separator).trim());
                         if (name.isEmpty()) return;
-                        int value = evalValue(args.substring(separator + 1));
+                        String rawValue = args.substring(separator + 1).trim();
+                        Object value;
+                        if (isQuoted(rawValue)) {
+                            value = unquote(rawValue);
+                        } else {
+                            String referencedName = getVarName(rawValue);
+                            value = referencedName == null
+                                    ? evalValue(rawValue)
+                                    : variables.getOrDefault(referencedName, 0);
+                        }
                         variables.put(name, value);
                         return;
                     }
@@ -323,10 +338,12 @@ public class SyntaxParser {
                         String message = np.trim();
                         if (message.startsWith("(") && message.endsWith(")"))
                             message = message.substring(1, message.length() - 1).trim();
-                        if (message.length() >= 2
-                                && ((message.startsWith("\"") && message.endsWith("\""))
-                                        || (message.startsWith("'") && message.endsWith("'"))))
+                        String referencedName = getVarName(message);
+                        if (referencedName != null) {
+                            message = String.valueOf(variables.getOrDefault(referencedName, 0));
+                        } else if (isQuoted(message)) {
                             message = message.substring(1, message.length() - 1);
+                        }
                         getEngine().getCombatLog().add(getEngine().formatText(message));
                         return;
                     case "clearInventory":
@@ -424,6 +441,20 @@ public class SyntaxParser {
                         || (result.startsWith("'") && result.endsWith("'"))))
             return result.substring(1, result.length() - 1);
         return result;
+    }
+
+    private boolean isQuoted(String value) {
+        String text = value.trim();
+        return text.length() >= 2
+                && ((text.startsWith("\"") && text.endsWith("\"")) || (text.startsWith("'") && text.endsWith("'")));
+    }
+
+    private String getVarName(String expression) {
+        String text = expression.trim();
+        if (!text.startsWith("getVar") || !text.endsWith(")")) return null;
+        String arguments = functionArguments(text.substring("getVar".length()));
+        if (findTopLevelComma(arguments) >= 0) return null;
+        return unquote(arguments);
     }
 
     private int findTopLevelComma(String value) {
