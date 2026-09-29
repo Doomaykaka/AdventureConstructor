@@ -27,6 +27,8 @@ public class SyntaxParser {
         "nextNPC",
         "random",
         "inventorySize",
+        "hasWeapon",
+        "hasArmor",
         "damage",
         "defend",
         "scale",
@@ -202,6 +204,8 @@ public class SyntaxParser {
             } catch (Exception x) {
             }
         if ("inventorySize".equals(fn)) return getPlayer().getInv().size();
+        if ("hasWeapon".equals(fn)) return getPlayer().getWeapon() != null ? 1 : 0;
+        if ("hasArmor".equals(fn)) return getPlayer().getArmor() != null ? 1 : 0;
         if ("random".equals(fn) || "damage".equals(fn)) return rng.nextInt(n) + 1;
         if ("heal".equals(fn) || "gold".equals(fn) || "exp".equals(fn) || "sp".equals(fn)) return n;
         if ("scale".equals(fn)) return n * getPlayer().getLevel();
