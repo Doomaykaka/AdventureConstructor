@@ -100,6 +100,7 @@ public class GameEngine {
                     l.setImage(jStr(lm, "image", ""));
                     l.setAmbient(jStr(lm, "ambient", ""));
                     l.setAutoTransition(jBool(lm, "auto_transition", true));
+                    l.setOnStart(jStr(lm, "on_start", ""));
                     if ("peaceful".equals(l.getType())) {
                         l.setNpcName(jStr(lm, "npc_name", ""));
                         l.setDialogId(jStr(lm, "dialog_id", ""));
@@ -415,6 +416,7 @@ public class GameEngine {
 
         getCombatLog().clear();
         transitionNavigationFailed = false;
+        transitionNavigation = null;
 
         if ("peaceful".equals(getCurLoc().getType())) {
             DialogData d = dialogs.get(getCurLoc().getDialogId());
@@ -422,11 +424,10 @@ public class GameEngine {
                 setCurDialog(d);
                 setCurNode(d.findNode("start"));
                 setMode("DIALOG");
-                syncPlayerToDb();
-                return;
+            } else {
+                setMode("EXPLORE");
             }
-        }
-        if ("hostile".equals(getCurLoc().getType())) {
+        } else if ("hostile".equals(getCurLoc().getType())) {
             setCurEnemy(new Enemy());
             getCurEnemy().setName(getCurLoc().getEnemyName());
             getCurEnemy().setHp(getCurLoc().getEnemyHp());
@@ -441,10 +442,21 @@ public class GameEngine {
                     .add(getCurEnemy().getName() + " (HP: " + getCurEnemy().getHp() + "/"
                             + getCurEnemy().getMaxHp() + ") appears!");
             setMode("COMBAT");
-            syncPlayerToDb();
-            return;
+        } else {
+            setMode("EXPLORE");
         }
-        setMode("EXPLORE");
+        String onStart = getCurLoc().getOnStart();
+        if (onStart != null && !onStart.trim().isEmpty()) {
+            transitionNavigation = parser.execute(onStart, getPlayer(), this);
+            if ("death".equals(transitionNavigation)) {
+                getPlayer().setAlive(false);
+                setMode("GAMEOVER");
+            } else if (transitionNavigation != null
+                    && !transitionNavigation.trim().isEmpty()) {
+                setTransitionMsg("Location started.");
+                setMode("TRANSITION");
+            }
+        }
         syncPlayerToDb();
     }
 

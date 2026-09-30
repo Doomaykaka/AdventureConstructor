@@ -10,6 +10,7 @@ public class LocTempCloner {
         l.setImage(src.getImage());
         l.setAmbient(src.getAmbient());
         l.setAutoTransition(src.isAutoTransition());
+        l.setOnStart(src.getOnStart());
         l.setNpcName(src.getNpcName());
         l.setDialogId(src.getDialogId());
         l.setOnSuccess(src.getOnSuccess());

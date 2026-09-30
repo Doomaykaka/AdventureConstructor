@@ -6,6 +6,7 @@
       "name": "Тестовый бой",
       "description": "Победи слабого врага: on_victory переведёт в test_search.",
       "auto_transition": false,
+      "on_start": "log(\"Проверка on_start: боевая локация\")",
       "enemy_name": "Слабый тестовый противник",
       "enemy_hp": 50,
       "enemy_damage": 1,
@@ -22,6 +23,7 @@
       "name": "Проверка поражения",
       "description": "Противник наносит большой урон. on_defeat должен выполниться и перевести в test_search.",
       "auto_transition": false,
+      "on_start": "log(\"Проверка on_start: боевая локация поражения\")",
       "enemy_name": "Сильный тестовый противник",
       "enemy_hp": 100,
       "enemy_damage": 1000,
@@ -36,6 +38,7 @@
       "name": "Тестовая мирная локация",
       "description": "Мирная локация после боя.",
       "auto_transition": false,
+      "on_start": "log(\"Проверка on_start: мирная локация\")",
       "npc_name": "Тестовый NPC",
       "dialog_id": "test_dialog",
       "on_success": "nextLocation(\"test_search\")",
@@ -47,6 +50,7 @@
       "name": "Заброшенный лагерь",
       "description": "Среди развалин лагеря видны следы недавней стоянки и закрытый дорожный сундук.",
       "auto_transition": false,
+      "on_start": "log(\"Проверка on_start: исследовательская локация\")",
       "actions": [
         {
           "text": "Проверить AND: оба условия истинны",

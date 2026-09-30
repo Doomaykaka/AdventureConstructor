@@ -11,6 +11,7 @@ public class LocTemp {
     private String image = "";
     private String ambient = "";
     private boolean autoTransition = true;
+    private String onStart;
 
     private String npcName;
     private String dialogId;
@@ -187,6 +188,14 @@ public class LocTemp {
 
     public void setAutoTransition(boolean autoTransition) {
         this.autoTransition = autoTransition;
+    }
+
+    public String getOnStart() {
+        return onStart;
+    }
+
+    public void setOnStart(String onStart) {
+        this.onStart = onStart;
     }
 
     public boolean isScaleEnemy() {
