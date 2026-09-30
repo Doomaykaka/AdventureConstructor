@@ -334,6 +334,7 @@ public class GameUI extends JFrame {
         d.add(new JScrollPane(list), BorderLayout.CENTER);
         JPanel bp = new JPanel();
         JButton eq = new JButton("Equip/Use");
+        JButton remove = new JButton("Delete Item");
         JButton cl = new JButton("Close");
         eq.addActionListener(e -> {
             int i = list.getSelectedIndex();
@@ -351,8 +352,18 @@ public class GameUI extends JFrame {
                 updateUI();
             }
         });
+        remove.addActionListener(e -> {
+            int i = list.getSelectedIndex();
+            if (i >= 0 && i < eng.getPlayer().getInv().size()) {
+                eng.getPlayer().getInv().remove(i);
+                model.remove(i);
+                updateStats();
+                updateUI();
+            }
+        });
         cl.addActionListener(e -> d.dispose());
         bp.add(eq);
+        bp.add(remove);
         bp.add(cl);
         d.add(bp, BorderLayout.SOUTH);
         d.setLocationRelativeTo(this);

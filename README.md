@@ -180,7 +180,7 @@ UML схема приложения:
 * **Условия** — сравнения, логические операторы `and`, `or`, `not` и тернарный оператор: `hp>20 and not hasArmor==1 ? damage3 : tryEscape`
 * **Арифметические операции** — сложение `+`, вычитание `-`, умножение `*`, деление `/`, возведение в степень `^`
 * **Изменения значений** — арифметическое присваивание: `hp+=10`, `gold-=20`, `exp+=scale20`, `str*=2`, `hp/=2`, `str^=2`
-* **Функции** — `randomN`, `damageN`, `healN`, `scaleN`, `scaleRNDN`, `item`, `itemWeapon`, `itemArmor`, `itemConsumable`, `log`, `showMessage`, `setVar`, `inputVar`, `inputNumberVar`, `confirmVar`, `getVar`, `appendVar`, `varEquals`, `varContains`, `stringLength`, `upper`, `lower`, `replace`, `concat`, `trim`, `hasVar`, `removeVar`, `clearInventory`, `removeWeapon`, `removeArmor`, `hasWeapon`, `hasArmor`, `nextFight`, `nextNPC`, `nextSearch`, `nextRandom`, `nextLocation`, `tryEscape`, `death`, `spN`, `goldN`, `expN`
+* **Функции** — `randomN`, `damageN`, `healN`, `scaleN`, `scaleRNDN`, `item`, `itemWeapon`, `itemArmor`, `itemConsumable`, `log`, `showMessage`, `setVar`, `inputVar`, `inputNumberVar`, `confirmVar`, `getVar`, `appendVar`, `varEquals`, `varContains`, `stringLength`, `upper`, `lower`, `replace`, `concat`, `trim`, `hasVar`, `hasItem`, `removeVar`, `clearInventory`, `removeWeapon`, `removeArmor`, `hasWeapon`, `hasArmor`, `nextFight`, `nextNPC`, `nextSearch`, `nextRandom`, `nextLocation`, `tryEscape`, `death`, `spN`, `goldN`, `expN`
 * **Подстановки в тексте** — `{gold}`, `{hp}`, `{maxHp}`, `{level}`, `{inventorySize}`, `{var:name}`, `{item}`, `{char.str}`, `{char.agi}`, `{char.intl}`, `{char.end}`
 
 Подробное описание каждого источника данных и синтаксиса приведено в подразделах ниже.
@@ -775,6 +775,7 @@ UML схема приложения:
 | `replace(строка, что, на)` | строка | Заменяет все вхождения подстроки | `replace(getVar("name"), "Иван", "Пётр")` |
 | `trim(строка)` | строка | Убирает пробелы в начале и конце | `trim(getVar("name"))` |
 | `hasVar("имя")` | значение | Возвращает `1`, если переменная задана, иначе `0` | `hasVar("name")==1 ? log("Есть имя") : log("Имени нет")` |
+| `hasItem("имя")` | значение | Возвращает `1`, если предмет с таким именем есть в инвентаре, иначе `0` | `hasItem("Меч проверки")==1 ? log("Предмет найден") : log("Предмет не найден")` |
 | `removeVar("имя")` | команда | Удаляет пользовательскую переменную | `removeVar("name")` |
 | `inventorySize` | значение | Возвращает количество предметов в инвентаре (без экипировки) | `inventorySize>0 ? log("Инвентарь не пуст") : log("Инвентарь пуст")` |
 | `hasWeapon` | значение | Возвращает `1`, если экипировано оружие, иначе `0` | `hasWeapon==1 ? log("Оружие экипировано") : log("Оружие не экипировано")` |

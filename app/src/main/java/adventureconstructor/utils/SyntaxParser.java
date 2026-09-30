@@ -53,6 +53,7 @@ public class SyntaxParser {
         "inventorySize",
         "hasWeapon",
         "hasArmor",
+        "hasItem",
         "damage",
         "defend",
         "scale",
@@ -480,6 +481,10 @@ public class SyntaxParser {
             return matches ? 1 : 0;
         }
         if ("inventorySize".equals(fn)) return getPlayer().getInv().size();
+        if ("hasItem".equals(fn)) {
+            String itemName = String.valueOf(evaluateStringValue(functionArguments(np)));
+            return getPlayer().getInv().stream().anyMatch(item -> itemName.equals(item.getName())) ? 1 : 0;
+        }
         if ("hasWeapon".equals(fn)) return getPlayer().getWeapon() != null ? 1 : 0;
         if ("hasArmor".equals(fn)) return getPlayer().getArmor() != null ? 1 : 0;
         if ("random".equals(fn) || "damage".equals(fn)) return rng.nextInt(n) + 1;

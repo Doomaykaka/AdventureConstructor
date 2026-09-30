@@ -90,4 +90,13 @@ class SyntaxParserTest {
         assertEquals("Имя из переменной", weapon.getName());
         assertEquals("weapon", weapon.getType());
     }
+
+    @Test
+    void checksForInventoryItemByName() {
+        engine.genItem("weapon", "Тестовый меч");
+
+        assertTrue(parser.evalCondition("hasItem(\"Тестовый меч\")==1"));
+        assertTrue(parser.evalCondition("hasItem(\"Несуществующий предмет\")==0"));
+        assertTrue(parser.evalCondition("hasItem(\"тестовый меч\")==0"));
+    }
 }
