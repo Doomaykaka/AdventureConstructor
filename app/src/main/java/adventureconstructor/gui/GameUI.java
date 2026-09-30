@@ -12,14 +12,20 @@ import adventureconstructor.utils.HibernateConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -66,6 +72,14 @@ public class GameUI extends JFrame {
 
     private void fillWindow() {
         scenePanel.setPreferredSize(new Dimension(900, 420));
+        scenePanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        scenePanel.setToolTipText("Click to view the location image at original size");
+        scenePanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event) {
+                showFullSizeLocationImage();
+            }
+        });
         add(scenePanel, BorderLayout.NORTH);
 
         textArea.setEditable(false);
@@ -101,6 +115,31 @@ public class GameUI extends JFrame {
         actionScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         actionScrollPane.setPreferredSize(new Dimension(900, 60));
         add(actionScrollPane, BorderLayout.SOUTH);
+    }
+
+    private void showFullSizeLocationImage() {
+        String imagePath = eng.getCurImagePath();
+        if (imagePath == null || !new File(imagePath).isFile()) return;
+
+        ImageIcon image = new ImageIcon(imagePath);
+        if (image.getIconWidth() <= 0 || image.getIconHeight() <= 0) return;
+
+        JScrollPane imageScrollPane = new JScrollPane(new JLabel(image));
+        imageScrollPane.setBorder(null);
+        Dimension screenSize = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                .getMaximumWindowBounds()
+                .getSize();
+        int viewportWidth = Math.min(image.getIconWidth(), Math.max(240, screenSize.width - 80));
+        int viewportHeight = Math.min(image.getIconHeight(), Math.max(160, screenSize.height - 120));
+        imageScrollPane.setPreferredSize(new Dimension(viewportWidth, viewportHeight));
+
+        JDialog imageDialog = new JDialog(this, "", false);
+        imageDialog.setResizable(true);
+        imageDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        imageDialog.setContentPane(imageScrollPane);
+        imageDialog.pack();
+        imageDialog.setLocationRelativeTo(this);
+        imageDialog.setVisible(true);
     }
 
     private void loadData() {
