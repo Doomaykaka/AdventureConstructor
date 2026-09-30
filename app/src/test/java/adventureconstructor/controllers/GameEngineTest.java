@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import adventureconstructor.models.Enemy;
 import adventureconstructor.models.LocAct;
 import adventureconstructor.models.LocTemp;
 import adventureconstructor.models.Player;
@@ -64,5 +65,40 @@ class GameEngineTest {
 
         assertEquals("GAMEOVER", engine.getMode());
         assertFalse(player.isAlive());
+    }
+
+    @Test
+    void successfulFleeRunsConfiguredEventAndUsesItsNavigation() {
+        LocTemp location = new LocTemp();
+        location.setAutoTransition(false);
+        location.setOnPlayerFlee("log(\"Player flee handler ran\"); nextSearch");
+        engine.setCurLoc(location);
+        player.setAgi(50);
+
+        engine.pFlee();
+
+        assertEquals("TRANSITION", engine.getMode());
+        assertTrue(engine.canContinueAfterTransition());
+        assertTrue(engine.getCombatLog().contains("Player flee handler ran"));
+    }
+
+    @Test
+    void enemyFleeRunsConfiguredEventAndUsesItsNavigation() {
+        LocTemp location = new LocTemp();
+        location.setAutoTransition(false);
+        location.setOnEnemyFlee("log(\"Enemy flee handler ran\"); nextNPC");
+        engine.setCurLoc(location);
+        Enemy enemy = new Enemy();
+        enemy.setName("Test enemy");
+        enemy.setMaxHp(20);
+        enemy.setHp(1);
+        engine.setCurEnemy(enemy);
+
+        engine.handleEnemyFlee();
+
+        assertEquals("TRANSITION", engine.getMode());
+        assertTrue(engine.canContinueAfterTransition());
+        assertTrue(engine.getCombatLog().contains("Enemy flee handler ran"));
+        assertEquals(10, player.getExp());
     }
 }

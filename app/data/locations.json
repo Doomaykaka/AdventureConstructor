@@ -7,12 +7,14 @@
       "description": "Победи слабого врага: on_victory переведёт в test_search.",
       "auto_transition": false,
       "enemy_name": "Слабый тестовый противник",
-      "enemy_hp": 4,
+      "enemy_hp": 50,
       "enemy_damage": 1,
       "enemy_defense": 0,
       "scale_enemy": false,
       "on_victory": "nextLocation(\"test_search\")",
-      "on_defeat": ""
+      "on_defeat": "",
+      "on_enemy_flee": "log(\"Enemy flee handler ran\"); nextLocation(\"test_search\")",
+      "on_player_flee": "log(\"Player flee handler ran\"); nextLocation(\"test_npc\")"
     },
     {
       "id": "test_defeat",

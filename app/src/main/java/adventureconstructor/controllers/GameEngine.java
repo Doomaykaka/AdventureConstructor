@@ -112,6 +112,8 @@ public class GameEngine {
                         l.setEnemyDef(jInt(lm, "enemy_defense", 2));
                         l.setOnVictory(jStr(lm, "on_victory", ""));
                         l.setOnDefeat(jStr(lm, "on_defeat", ""));
+                        l.setOnEnemyFlee(jStr(lm, "on_enemy_flee", ""));
+                        l.setOnPlayerFlee(jStr(lm, "on_player_flee", jStr(lm, "on_flee", "")));
                         l.setScaleEnemy(jBool(lm, "scale_enemy", true));
                     } else if ("exploratory".equals(l.getType())) {
                         JSONArray acts = (JSONArray) lm.get("actions");
@@ -554,6 +556,7 @@ public class GameEngine {
     public void pFlee() {
         if (rng.nextInt(100) < getPlayer().fleeChance()) {
             getCombatLog().add("You escaped!");
+            executeFleeEvent(getCurLoc().getOnPlayerFlee());
             getPlayer().heal(getPlayer().getMaxHp() / 4);
             setTransitionMsg("Escaped successfully.");
             setMode("TRANSITION");
@@ -583,19 +586,30 @@ public class GameEngine {
             getCombatLog().add(getCurEnemy().getName() + " guards.");
         } else if ("flee".equals(act)) {
             if (rng.nextInt(100) < 50) {
-                getCombatLog().add(getCurEnemy().getName() + " flees!");
-                getPlayer().gainExp(getCurEnemy().getMaxHp() / 2);
-                getPlayer().heal(getPlayer().getMaxHp() / 4);
-                setTransitionMsg(
-                        getCurEnemy().getName() + " fled! +" + (getCurEnemy().getMaxHp() / 2) + " exp.");
-                setMode("TRANSITION");
-                incScore();
-                syncPlayerToDb();
+                handleEnemyFlee();
                 return;
             } else getCombatLog().add(getCurEnemy().getName() + " tries to flee but fails!");
         }
         playerGuarding = false;
         checkCombatEnd();
+    }
+
+    private void executeFleeEvent(String event) {
+        transitionNavigation = null;
+        if (event != null && !event.trim().isEmpty()) {
+            transitionNavigation = parser.execute(event, getPlayer(), this);
+        }
+    }
+
+    void handleEnemyFlee() {
+        getCombatLog().add(getCurEnemy().getName() + " flees!");
+        getPlayer().gainExp(getCurEnemy().getMaxHp() / 2);
+        executeFleeEvent(getCurLoc().getOnEnemyFlee());
+        getPlayer().heal(getPlayer().getMaxHp() / 4);
+        setTransitionMsg(getCurEnemy().getName() + " fled! +" + (getCurEnemy().getMaxHp() / 2) + " exp.");
+        setMode("TRANSITION");
+        incScore();
+        syncPlayerToDb();
     }
 
     boolean checkCombatEnd() {

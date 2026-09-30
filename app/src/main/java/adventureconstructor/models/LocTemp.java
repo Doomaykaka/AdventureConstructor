@@ -23,6 +23,8 @@ public class LocTemp {
     private int enemyDef;
     private String onVictory;
     private String onDefeat;
+    private String onEnemyFlee;
+    private String onPlayerFlee;
     private boolean scaleEnemy = true;
 
     private List<LocAct> actions = new ArrayList<>();
@@ -137,6 +139,22 @@ public class LocTemp {
 
     public void setOnDefeat(String onDefeat) {
         this.onDefeat = onDefeat;
+    }
+
+    public String getOnEnemyFlee() {
+        return onEnemyFlee;
+    }
+
+    public void setOnEnemyFlee(String onEnemyFlee) {
+        this.onEnemyFlee = onEnemyFlee;
+    }
+
+    public String getOnPlayerFlee() {
+        return onPlayerFlee;
+    }
+
+    public void setOnPlayerFlee(String onPlayerFlee) {
+        this.onPlayerFlee = onPlayerFlee;
     }
 
     public List<LocAct> getActions() {

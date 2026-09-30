@@ -21,6 +21,8 @@ public class LocTempCloner {
         l.setScaleEnemy(src.isScaleEnemy());
         l.setOnVictory(src.getOnVictory());
         l.setOnDefeat(src.getOnDefeat());
+        l.setOnEnemyFlee(src.getOnEnemyFlee());
+        l.setOnPlayerFlee(src.getOnPlayerFlee());
         l.getActions().addAll(src.getActions());
         return l;
     }
