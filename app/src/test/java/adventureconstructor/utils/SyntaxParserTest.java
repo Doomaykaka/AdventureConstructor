@@ -99,4 +99,21 @@ class SyntaxParserTest {
         assertTrue(parser.evalCondition("hasItem(\"Несуществующий предмет\")==0"));
         assertTrue(parser.evalCondition("hasItem(\"тестовый меч\")==0"));
     }
+
+    @Test
+    void removesFirstInventoryItemWithMatchingName() {
+        engine.genItem("weapon", "Тестовый меч");
+        engine.genItem("armor", "Тестовая броня");
+        engine.genItem("consumable", "Тестовый меч");
+
+        parser.execute("removeItem(\"Тестовый меч\")", player, engine);
+
+        assertEquals(2, player.getInv().size());
+        assertEquals("Тестовая броня", player.getInv().get(0).getName());
+        assertEquals("Тестовый меч", player.getInv().get(1).getName());
+        assertTrue(parser.evalCondition("hasItem(\"Тестовый меч\")==1"));
+
+        parser.execute("removeItem(\"Несуществующий предмет\")", player, engine);
+        assertEquals(2, player.getInv().size());
+    }
 }

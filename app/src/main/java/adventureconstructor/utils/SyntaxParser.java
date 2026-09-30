@@ -22,6 +22,7 @@ public class SyntaxParser {
         "log",
         "removeWeapon",
         "removeArmor",
+        "removeItem",
         "itemConsumable",
         "itemWeapon",
         "itemArmor",
@@ -671,6 +672,16 @@ public class SyntaxParser {
                     case "removeArmor":
                         getPlayer().setArmor(null);
                         return;
+                    case "removeItem": {
+                        String itemName = String.valueOf(evaluateStringValue(functionArguments(np)));
+                        for (int i = 0; i < getPlayer().getInv().size(); i++) {
+                            if (itemName.equals(getPlayer().getInv().get(i).getName())) {
+                                getPlayer().getInv().remove(i);
+                                break;
+                            }
+                        }
+                        return;
+                    }
                     case "nextFight":
                         nav = "nextFight";
                         return;
