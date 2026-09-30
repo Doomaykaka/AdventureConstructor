@@ -1,6 +1,7 @@
 package adventureconstructor.utils;
 
 import adventureconstructor.controllers.GameEngine;
+import adventureconstructor.models.Item;
 import adventureconstructor.models.Player;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ public class SyntaxParser {
         "removeWeapon",
         "removeArmor",
         "removeItem",
+        "levelUpItem",
         "itemConsumable",
         "itemWeapon",
         "itemArmor",
@@ -679,6 +681,26 @@ public class SyntaxParser {
                                 getPlayer().getInv().remove(i);
                                 break;
                             }
+                        }
+                        return;
+                    }
+                    case "levelUpItem": {
+                        String itemName = String.valueOf(evaluateStringValue(functionArguments(np)));
+                        for (int i = 0; i < getPlayer().getInv().size(); i++) {
+                            if (itemName.equals(getPlayer().getInv().get(i).getName())) {
+                                Item item = getPlayer().getInv().get(i);
+                                item.setValue(item.getValue() + 1);
+                                return;
+                            }
+                        }
+                        Item weapon = getPlayer().getWeapon();
+                        if (weapon != null && itemName.equals(weapon.getName())) {
+                            weapon.setValue(weapon.getValue() + 1);
+                            return;
+                        }
+                        Item armor = getPlayer().getArmor();
+                        if (armor != null && itemName.equals(armor.getName())) {
+                            armor.setValue(armor.getValue() + 1);
                         }
                         return;
                     }

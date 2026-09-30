@@ -116,4 +116,37 @@ class SyntaxParserTest {
         parser.execute("removeItem(\"Несуществующий предмет\")", player, engine);
         assertEquals(2, player.getInv().size());
     }
+
+    @Test
+    void increasesValueOfNamedInventoryItem() {
+        engine.genItem("weapon", "Тестовый меч");
+        Item weapon = player.getInv().get(0);
+        int initialValue = weapon.getValue();
+
+        parser.execute("levelUpItem(\"Тестовый меч\")", player, engine);
+
+        assertEquals(initialValue + 1, weapon.getValue());
+    }
+
+    @Test
+    void increasesValueOfNamedEquippedItem() {
+        Item armor = new Item("Тестовая броня", "armor", 3);
+        player.setArmor(armor);
+
+        parser.execute("levelUpItem(\"Тестовая броня\")", player, engine);
+
+        assertEquals(4, armor.getValue());
+        assertTrue(player.getInv().isEmpty());
+    }
+
+    @Test
+    void leavesItemsUnchangedWhenNameIsNotFound() {
+        engine.genItem("weapon", "Тестовый меч");
+        Item weapon = player.getInv().get(0);
+        int initialValue = weapon.getValue();
+
+        parser.execute("levelUpItem(\"Несуществующий предмет\")", player, engine);
+
+        assertEquals(initialValue, weapon.getValue());
+    }
 }
