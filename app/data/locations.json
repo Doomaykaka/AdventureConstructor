@@ -4,15 +4,29 @@
       "id": "test_battle",
       "type": "hostile",
       "name": "Тестовый бой",
-      "description": "Проверка перехода nextRandom после победы.",
+      "description": "Победи слабого врага: on_victory переведёт в test_search.",
       "auto_transition": false,
       "enemy_name": "Слабый тестовый противник",
       "enemy_hp": 4,
       "enemy_damage": 1,
       "enemy_defense": 0,
       "scale_enemy": false,
-      "on_victory": "nextRandom",
+      "on_victory": "nextLocation(\"test_search\")",
       "on_defeat": ""
+    },
+    {
+      "id": "test_defeat",
+      "type": "hostile",
+      "name": "Проверка поражения",
+      "description": "Противник наносит большой урон. on_defeat должен выполниться и перевести в test_search.",
+      "auto_transition": false,
+      "enemy_name": "Сильный тестовый противник",
+      "enemy_hp": 100,
+      "enemy_damage": 1000,
+      "enemy_defense": 0,
+      "scale_enemy": false,
+      "on_victory": "nextLocation(\"test_search\")",
+      "on_defeat": "log(\"Поражение; вопрос? равенство =\"); heal50; nextLocation(\"test_search\")"
     },
     {
       "id": "test_npc",
@@ -22,8 +36,8 @@
       "auto_transition": false,
       "npc_name": "Тестовый NPC",
       "dialog_id": "test_dialog",
-      "on_success": "nextRandom",
-      "on_fail": "nextLocation(\"test_battle\")"
+      "on_success": "nextLocation(\"test_search\")",
+      "on_fail": "nextLocation(\"test_defeat\")"
     },
     {
       "id": "test_search",
@@ -59,6 +73,18 @@
         {
           "text": "Проверить скобки и приоритет операторов",
           "result": "(1==2 or 2==2) and not 3==4 ? log(\"Составное условие выполнено\") : log(\"Ошибка группировки или приоритета\")"
+        },
+        {
+          "text": "Проверить знаки внутри информационного диалога",
+          "result": "showMessage(\"Вопрос? Равенство =; точка с запятой внутри строки.\")"
+        },
+        {
+          "text": "Проверить знаки внутри тернарного выражения",
+          "result": "1==1 ? showMessage(\"Условие верно: да?\") : showMessage(\"Условие неверно: нет?\")"
+        },
+        {
+          "text": "Проверить death",
+          "result": "death"
         }
       ]
     }

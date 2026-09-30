@@ -600,6 +600,19 @@ public class GameEngine {
 
     boolean checkCombatEnd() {
         if (getPlayer().getHp() <= 0) {
+            transitionNavigation = null;
+            String onDefeat = getCurLoc().getOnDefeat();
+            if (onDefeat != null && !onDefeat.trim().isEmpty()) {
+                transitionNavigation = parser.execute(onDefeat, getPlayer(), this);
+            }
+            if (transitionNavigation != null
+                    && !transitionNavigation.trim().isEmpty()
+                    && !"death".equals(transitionNavigation)) {
+                setTransitionMsg("Defeat.");
+                setMode("TRANSITION");
+                syncPlayerToDb();
+                return true;
+            }
             getPlayer().setAlive(false);
             setMode("GAMEOVER");
             syncPlayerToDb();
@@ -624,6 +637,12 @@ public class GameEngine {
     public void execAction(LocAct a) {
         String nav = parser.execute(a.getResult(), getPlayer(), this);
         if (getPlayer().getHp() <= 0) {
+            getPlayer().setAlive(false);
+            setMode("GAMEOVER");
+            syncPlayerToDb();
+            return;
+        }
+        if ("death".equals(nav)) {
             getPlayer().setAlive(false);
             setMode("GAMEOVER");
             syncPlayerToDb();

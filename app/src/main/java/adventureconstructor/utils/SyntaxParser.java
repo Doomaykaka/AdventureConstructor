@@ -72,7 +72,7 @@ public class SyntaxParser {
 
         if (expr == null || expr.trim().isEmpty()) return null;
 
-        for (String part : expr.split(";")) {
+        for (String part : splitTopLevelExpressions(expr, ';')) {
             part = part.trim();
 
             if (!part.isEmpty()) execOneExpression(part);
@@ -82,7 +82,7 @@ public class SyntaxParser {
     }
 
     private void execOneExpression(String expr) {
-        int qi = expr.indexOf('?');
+        int qi = findTopLevelCharacter(expr, '?');
 
         if (qi >= 0) {
             parseCondition(expr, qi);
@@ -91,7 +91,7 @@ public class SyntaxParser {
         }
 
         for (String op : new String[] {"+=", "-=", "*=", "/=", "^=", "="}) {
-            int oi = expr.indexOf(op);
+            int oi = findTopLevelOperator(expr, op);
 
             if (oi > 0) {
                 parseOperator(expr, op, oi);
@@ -105,10 +105,117 @@ public class SyntaxParser {
 
     private void parseCondition(String expr, int qi) {
         String cond = expr.substring(0, qi).trim();
-        int ci = expr.lastIndexOf(':');
+        int ci = findMatchingTernaryColon(expr, qi + 1);
+        if (ci < 0) return;
         String t = expr.substring(qi + 1, ci).trim();
         String f = expr.substring(ci + 1).trim();
         execOneExpression(evalCondition(cond) ? t : f);
+    }
+
+    private List<String> splitTopLevelExpressions(String expression, char separator) {
+        List<String> parts = new ArrayList<>();
+        int start = 0;
+        int depth = 0;
+        char quote = 0;
+        for (int i = 0; i < expression.length(); i++) {
+            char current = expression.charAt(i);
+            if (quote != 0) {
+                if (current == quote && !isEscaped(expression, i)) quote = 0;
+            } else if (current == '"' || current == '\'') {
+                quote = current;
+            } else if (current == '(') {
+                depth++;
+            } else if (current == ')') {
+                depth--;
+            } else if (current == separator && depth == 0) {
+                parts.add(expression.substring(start, i));
+                start = i + 1;
+            }
+        }
+        parts.add(expression.substring(start));
+        return parts;
+    }
+
+    private int findTopLevelCharacter(String expression, char target) {
+        int depth = 0;
+        char quote = 0;
+        for (int i = 0; i < expression.length(); i++) {
+            char current = expression.charAt(i);
+            if (quote != 0) {
+                if (current == quote && !isEscaped(expression, i)) quote = 0;
+            } else if (current == '"' || current == '\'') {
+                quote = current;
+            } else if (current == '(') {
+                depth++;
+            } else if (current == ')') {
+                depth--;
+            } else if (current == target && depth == 0) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int findTopLevelOperator(String expression, String operator) {
+        int depth = 0;
+        char quote = 0;
+        for (int i = 0; i <= expression.length() - operator.length(); i++) {
+            char current = expression.charAt(i);
+            if (quote != 0) {
+                if (current == quote && !isEscaped(expression, i)) quote = 0;
+                continue;
+            }
+            if (current == '"' || current == '\'') {
+                quote = current;
+                continue;
+            }
+            if (current == '(') {
+                depth++;
+                continue;
+            }
+            if (current == ')') {
+                depth--;
+                continue;
+            }
+            if (depth != 0 || !expression.startsWith(operator, i)) continue;
+            if ("=".equals(operator)
+                    && ((i > 0 && "=!<>".indexOf(expression.charAt(i - 1)) >= 0)
+                            || (i + 1 < expression.length() && expression.charAt(i + 1) == '='))) continue;
+            return i;
+        }
+        return -1;
+    }
+
+    private int findMatchingTernaryColon(String expression, int start) {
+        int depth = 0;
+        int nestedTernaries = 0;
+        char quote = 0;
+        for (int i = start; i < expression.length(); i++) {
+            char current = expression.charAt(i);
+            if (quote != 0) {
+                if (current == quote && !isEscaped(expression, i)) quote = 0;
+                continue;
+            }
+            if (current == '"' || current == '\'') {
+                quote = current;
+            } else if (current == '(') {
+                depth++;
+            } else if (current == ')') {
+                depth--;
+            } else if (depth == 0 && current == '?') {
+                nestedTernaries++;
+            } else if (depth == 0 && current == ':') {
+                if (nestedTernaries == 0) return i;
+                nestedTernaries--;
+            }
+        }
+        return -1;
+    }
+
+    private boolean isEscaped(String value, int index) {
+        int backslashes = 0;
+        for (int i = index - 1; i >= 0 && value.charAt(i) == '\\'; i--) backslashes++;
+        return backslashes % 2 != 0;
     }
 
     private void parseOperator(String expr, String op, int oi) {
