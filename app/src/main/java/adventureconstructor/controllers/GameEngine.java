@@ -10,6 +10,7 @@ import adventureconstructor.models.LocTemp;
 import adventureconstructor.models.LocTempCloner;
 import adventureconstructor.models.Player;
 import adventureconstructor.utils.AmbientPlayer;
+import adventureconstructor.utils.JsonCommentStripper;
 import adventureconstructor.utils.SupportFunctions;
 import adventureconstructor.utils.SyntaxParser;
 import java.nio.file.Files;
@@ -87,7 +88,7 @@ public class GameEngine {
                     .toFile()
                     .getAbsolutePath());
             String locText = new String(Files.readAllBytes(locPath));
-            JSONObject root = (JSONObject) parser.parse(locText);
+            JSONObject root = (JSONObject) parser.parse(JsonCommentStripper.strip(locText));
             JSONArray locs = (JSONArray) root.get("locations");
             if (locs != null) {
                 for (Object lo : locs) {
@@ -143,7 +144,7 @@ public class GameEngine {
                     .toFile()
                     .getAbsolutePath());
             String dlgText = new String(Files.readAllBytes(dlgPath));
-            JSONObject root = (JSONObject) parser.parse(dlgText);
+            JSONObject root = (JSONObject) parser.parse(JsonCommentStripper.strip(dlgText));
             for (Object eo : root.entrySet()) {
                 Map.Entry<String, Object> en = (Map.Entry<String, Object>) eo;
                 if (!(en.getValue() instanceof JSONObject)) continue;
@@ -194,7 +195,7 @@ public class GameEngine {
                     .toFile()
                     .getAbsolutePath());
             String nmText = new String(Files.readAllBytes(nmPath));
-            JSONObject root = (JSONObject) parser.parse(nmText);
+            JSONObject root = (JSONObject) parser.parse(JsonCommentStripper.strip(nmText));
             for (Object eo : root.entrySet()) {
                 Map.Entry<String, Object> en = (Map.Entry<String, Object>) eo;
                 if (en.getValue() instanceof JSONArray) {
@@ -217,7 +218,7 @@ public class GameEngine {
                     .getAbsolutePath());
             if (Files.exists(imgPath)) {
                 String imgText = new String(Files.readAllBytes(imgPath));
-                JSONObject root = (JSONObject) parser.parse(imgText);
+                JSONObject root = (JSONObject) parser.parse(JsonCommentStripper.strip(imgText));
                 for (Object eo : root.entrySet()) {
                     Map.Entry<String, Object> en = (Map.Entry<String, Object>) eo;
                     if (en.getValue() instanceof JSONArray) {
@@ -241,7 +242,7 @@ public class GameEngine {
                     .getAbsolutePath());
             if (Files.exists(ambPath)) {
                 String ambText = new String(Files.readAllBytes(ambPath));
-                JSONObject root = (JSONObject) parser.parse(ambText);
+                JSONObject root = (JSONObject) parser.parse(JsonCommentStripper.strip(ambText));
                 for (Object eo : root.entrySet()) {
                     Map.Entry<String, Object> en = (Map.Entry<String, Object>) eo;
                     if (en.getValue() instanceof JSONArray) {

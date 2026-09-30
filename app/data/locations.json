@@ -1,4 +1,6 @@
 {
+  // Bundled sample data also exercises support for JSON line comments.
+  /* Block comments are supported in external resource files too. */
   "locations": [
     {
       "id": "test_battle",
