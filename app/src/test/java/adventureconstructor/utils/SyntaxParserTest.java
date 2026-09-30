@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import adventureconstructor.controllers.GameEngine;
+import adventureconstructor.models.Item;
 import adventureconstructor.models.Player;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,5 +63,31 @@ class SyntaxParserTest {
     @Test
     void returnsNavigationForExplicitLocationId() {
         assertEquals("nextLocation:test_search", parser.execute("nextLocation(\"test_search\")", player, engine));
+    }
+
+    @Test
+    void createsNamedWeaponArmorAndConsumable() {
+        parser.execute(
+                "itemWeapon(\"Тестовый меч\"); itemArmor(\"Тестовая броня\"); " + "itemConsumable(\"Тестовое зелье\")",
+                player,
+                engine);
+
+        assertEquals(3, player.getInv().size());
+        assertEquals("Тестовый меч", player.getInv().get(0).getName());
+        assertEquals("weapon", player.getInv().get(0).getType());
+        assertEquals("Тестовая броня", player.getInv().get(1).getName());
+        assertEquals("armor", player.getInv().get(1).getType());
+        assertEquals("Тестовое зелье", player.getInv().get(2).getName());
+        assertEquals("consumable", player.getInv().get(2).getType());
+    }
+
+    @Test
+    void namedItemFunctionsAcceptStringExpressions() {
+        parser.execute(
+                "setVar(\"weaponName\", \"Имя из переменной\"); itemWeapon(getVar(\"weaponName\"))", player, engine);
+
+        Item weapon = player.getInv().get(0);
+        assertEquals("Имя из переменной", weapon.getName());
+        assertEquals("weapon", weapon.getType());
     }
 }

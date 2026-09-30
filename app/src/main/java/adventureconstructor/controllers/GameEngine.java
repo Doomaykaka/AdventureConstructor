@@ -738,26 +738,26 @@ public class GameEngine {
     }
 
     public void genItem(String type) {
+        genItem(type, null);
+    }
+
+    public void genItem(String type, String specifiedName) {
         if ("random".equals(type)) {
             String[] t = {"weapon", "armor", "consumable"};
             type = t[rng.nextInt(3)];
         }
         Item it;
+        String itemName = specifiedName;
         if ("weapon".equals(type)) {
-            it = new Item(
-                    pickName("weapon_names"),
-                    "weapon",
-                    rng.nextInt(3) + 1 + getPlayer().getLevel());
+            if (itemName == null) itemName = pickName("weapon_names");
+            it = new Item(itemName, "weapon", rng.nextInt(3) + 1 + getPlayer().getLevel());
         } else if ("armor".equals(type)) {
-            it = new Item(
-                    pickName("armor_names"),
-                    "armor",
-                    rng.nextInt(2) + 1 + getPlayer().getLevel() / 2);
+            if (itemName == null) itemName = pickName("armor_names");
+            it = new Item(itemName, "armor", rng.nextInt(2) + 1 + getPlayer().getLevel() / 2);
         } else {
+            if (itemName == null) itemName = pickName("consumable_names");
             it = new Item(
-                    pickName("consumable_names"),
-                    "consumable",
-                    rng.nextInt(10) + 5 + getPlayer().getLevel());
+                    itemName, "consumable", rng.nextInt(10) + 5 + getPlayer().getLevel());
         }
         getPlayer().getInv().add(it);
     }

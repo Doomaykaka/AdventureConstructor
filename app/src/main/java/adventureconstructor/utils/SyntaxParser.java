@@ -700,13 +700,18 @@ public class SyntaxParser {
                         getEngine().genItem("random");
                         return;
                     case "itemWeapon":
-                        getEngine().genItem("weapon");
+                        if (functionArguments(np).isEmpty()) getEngine().genItem("weapon");
+                        else getEngine().genItem("weapon", String.valueOf(evaluateStringValue(functionArguments(np))));
                         return;
                     case "itemArmor":
-                        getEngine().genItem("armor");
+                        if (functionArguments(np).isEmpty()) getEngine().genItem("armor");
+                        else getEngine().genItem("armor", String.valueOf(evaluateStringValue(functionArguments(np))));
                         return;
                     case "itemConsumable":
-                        getEngine().genItem("consumable");
+                        if (functionArguments(np).isEmpty()) getEngine().genItem("consumable");
+                        else
+                            getEngine()
+                                    .genItem("consumable", String.valueOf(evaluateStringValue(functionArguments(np))));
                         return;
                     case "damage":
                         getPlayer().damage(rng.nextInt(n) + 1);
